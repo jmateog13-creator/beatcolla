@@ -1,0 +1,1493 @@
+<title>BeatColla</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Mono:wght@500&display=swap">
+<style>
+/* Layout: escenari de 7 personatges a dalt, panell lateral (textura / reptes), paleta de sons per capes a sota */
+:root{
+  --bg:#ECEEF5; --surface:#FFFFFF; --surface-2:#F4F5FA; --ink:#1C1B27; --muted:#5D6074; --line:#D6D9E5;
+  --stage-top:#DDE1EF; --stage-bot:#C9CEE2; --floor:#B4BAD2; --empty:#A9AFC6;
+  --acc-dark:#24212D; --acc-light:#FFFFFF; --mystery:#8A8FA6;
+  --ritme:#E5484D; --baix:#7C5CE0; --harmonia:#2D8FD5; --melodia:#E3A008; --efectes:#1FA577;
+  --ok:#1C9A5F; --ok-bg:#E3F6EC; --bad:#C2413B; --bad-bg:#FBE9E8;
+  --style:#F0703A;
+  --f-display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#13131B; --surface:#1C1C27; --surface-2:#242432; --ink:#ECEBF5; --muted:#A4A4BA; --line:#33334A;
+  --stage-top:#25253A; --stage-bot:#1A1A29; --floor:#2E2E46; --empty:#4A4A66;
+  --acc-dark:#121219; --acc-light:#F4F3FA; --mystery:#6C6F88;
+  --ok:#3CCB86; --ok-bg:#16301F; --bad:#F0726B; --bad-bg:#3A1D1C;
+  color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#13131B; --surface:#1C1C27; --surface-2:#242432; --ink:#ECEBF5; --muted:#A4A4BA; --line:#33334A;
+  --stage-top:#25253A; --stage-bot:#1A1A29; --floor:#2E2E46; --empty:#4A4A66;
+  --acc-dark:#121219; --acc-light:#F4F3FA; --mystery:#6C6F88;
+  --ok:#3CCB86; --ok-bg:#16301F; --bad:#F0726B; --bad-bg:#3A1D1C;
+  color-scheme:dark }
+[data-style="hh"]{--style:#F0703A} [data-style="rg"]{--style:#E2457E} [data-style="tc"]{--style:#1AA3C4} [data-style="tr"]{--style:#8B5CF6} [data-style="rc"]{--style:#D4572A}
+
+*{box-sizing:border-box}
+body{background:var(--bg); color:var(--ink); font-family:var(--f-body); font-size:15px; line-height:1.45;
+  padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px)); padding-block:14px 40px}
+button{font:inherit; color:inherit; cursor:pointer}
+button:focus-visible, input:focus-visible{outline:3px solid var(--style); outline-offset:2px}
+.wrap{max-width:1240px; margin:0 auto; display:flex; flex-direction:column; gap:14px}
+
+/* Capçalera */
+header.top{display:flex; flex-wrap:wrap; align-items:center; gap:12px 18px}
+.logo{font-family:var(--f-display); font-weight:800; font-size:30px; letter-spacing:-.02em; line-height:1; display:flex; align-items:baseline; gap:2px}
+.logo b{color:var(--style); font-weight:800}
+.logo small{font-family:var(--f-body); font-weight:400; font-size:13px; color:var(--muted); letter-spacing:0; margin-left:10px}
+.seg{display:inline-flex; background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:3px}
+.seg button{border:0; background:transparent; border-radius:999px; padding:7px 14px; font-weight:700; color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink); color:var(--bg)}
+.spacer{flex:1}
+.stars{font-family:var(--f-mono); font-size:15px; background:var(--surface); border:1px solid var(--line); padding:7px 12px; border-radius:999px; display:flex; gap:6px; align-items:center}
+.stars .s{color:var(--melodia)}
+
+/* Estils */
+.styles{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px}
+.stab{border:1px solid var(--line); background:var(--surface); border-radius:var(--r); padding:10px 12px; text-align:left; display:flex; flex-direction:column; gap:2px; position:relative}
+.stab .n{font-family:var(--f-display); font-weight:800; font-size:19px; line-height:1.1}
+.stab .m{font-family:var(--f-mono); font-size:12px; color:var(--muted)}
+.stab[aria-pressed="true"]{border-color:var(--sc); box-shadow:inset 0 0 0 2px var(--sc)}
+.stab[aria-pressed="true"] .n{color:var(--sc)}
+.stab:disabled{opacity:.45; cursor:not-allowed}
+
+/* Zona principal */
+.main{display:grid; grid-template-columns:minmax(0,1fr) 330px; gap:14px; align-items:start}
+.stage{border-radius:20px 20px 0 0;background:linear-gradient(180deg,var(--stage-top),var(--stage-bot)); position:relative; padding:14px 14px 0; overflow:hidden; min-width:0}
+.stagebar{display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px}
+.play{width:52px; height:52px; border-radius:50%; border:0; background:var(--style); color:#fff; display:grid; place-items:center; flex:none; box-shadow:0 4px 0 rgba(0,0,0,.18)}
+.play:active{transform:translateY(2px); box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.play svg{width:22px; height:22px}
+.meta{font-family:var(--f-mono); font-size:12.5px; color:var(--muted); display:flex; flex-direction:column; gap:1px}
+.meta strong{color:var(--ink); font-weight:500; font-size:14px}
+.prog{display:flex; gap:6px; margin-left:auto}
+.bar{background:var(--surface); border-radius:10px; padding:5px 9px 6px; min-width:58px; display:flex; flex-direction:column; gap:4px; align-items:center; border:2px solid transparent; transition:border-color .1s}
+.bar .c{font-family:var(--f-display); font-weight:800; font-size:16px; line-height:1}
+.bar .beats{display:flex; gap:4px}
+.bar .beats i{width:6px; height:6px; border-radius:50%; background:var(--line)}
+.bar.on{border-color:var(--style)}
+.bar.on .beats i.on{background:var(--style)}
+.proglbl{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); align-self:center}
+
+.slots{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:6px; margin-top:12px; position:relative; z-index:1}
+.floor{position:absolute; left:0; right:0; bottom:0; height:64px; background:var(--floor); opacity:.55}
+.slot{display:flex; flex-direction:column; align-items:center; gap:2px; padding:4px 2px 10px; border-radius:16px; transition:background .15s; min-width:0}
+.slot.drop{background:color-mix(in srgb, var(--style) 22%, transparent)}
+.figbtn{border:0; background:transparent; padding:0; width:100%; max-width:120px; display:block}
+.char{width:100%; height:auto; display:block; overflow:visible}
+.char .fig{transform-box:fill-box; transform-origin:50% 100%; transform:translateY(calc(var(--lv,0) * -9px)) scaleY(calc(1 + var(--lv,0) * .04))}
+.char .body,.char .head{fill:var(--c)}
+.char .acc{fill:var(--acc-dark)} .char .acc2{fill:var(--acc-light)} .char .accs{stroke:var(--acc-dark); fill:none; stroke-linecap:round}
+.char .eye{fill:#fff; transform-box:fill-box; transform-origin:center; animation:blink 5s infinite}
+.char .pupil{fill:#1C1B27; transform-box:fill-box; transform-origin:center; animation:blink 5s infinite}
+.char .mouth{fill:#2A1620}
+.char .cheek{fill:#fff; opacity:.22}
+.char .shadow{fill:#000; opacity:.13}
+.char .q{fill:#fff; font-family:var(--f-display); font-weight:800; font-size:40px; text-anchor:middle}
+.slot:nth-child(2n) .eye,.slot:nth-child(2n) .pupil{animation-delay:1.7s}
+.slot:nth-child(3n) .eye,.slot:nth-child(3n) .pupil{animation-delay:3.1s}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+.slot.muted .char{filter:grayscale(1); opacity:.42}
+.slot.muted .eye,.slot.muted .pupil{animation:none; transform:scaleY(.12)}
+.slot.soloed .figbtn{filter:drop-shadow(0 0 10px var(--c))}
+.slot-name{font-weight:700; font-size:13px; text-align:center; line-height:1.15; min-height:2.3em; display:flex; align-items:center; overflow-wrap:anywhere}
+.slot-layer{font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; font-weight:700; color:var(--c)}
+.slot-ctl{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:3px; margin-top:4px; width:100%; max-width:118px}
+.slot-ctl button{width:100%; min-width:0; height:26px; border-radius:8px; border:1px solid var(--line); background:var(--surface); font-family:var(--f-mono); font-size:12px; padding:0}
+.slot-ctl button[aria-pressed="true"]{background:var(--ink); color:var(--bg); border-color:var(--ink)}
+.ph{width:100%; max-width:120px; aspect-ratio:120/190; border:2.5px dashed var(--empty); border-radius:46px 46px 30px 30px; display:grid; place-items:center; color:var(--empty); font-family:var(--f-display); font-weight:800; font-size:34px}
+.slot.empty .slot-name{color:var(--muted); font-weight:400}
+
+.startov{position:absolute; inset:0; z-index:3; display:grid; place-items:center; background:color-mix(in srgb, var(--stage-bot) 55%, transparent); backdrop-filter:blur(2px)}
+.startov button{border:0; background:var(--style); color:#fff; font-family:var(--f-display); font-weight:800; font-size:22px; padding:16px 26px; border-radius:999px; box-shadow:0 6px 0 rgba(0,0,0,.2); display:flex; gap:10px; align-items:center}
+.startov p{margin:10px 0 0; text-align:center; color:var(--ink); font-size:14px}
+
+/* Accions */
+.actions{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+.btn{border:1px solid var(--line); background:var(--surface); border-radius:10px; padding:8px 13px; font-weight:700; display:inline-flex; align-items:center; gap:7px}
+.btn.primary{background:var(--ink); color:var(--bg); border-color:var(--ink)}
+.btn.rec .dot{width:10px; height:10px; border-radius:50%; background:var(--ritme)}
+.btn.rec.on{background:var(--ritme); color:#fff; border-color:var(--ritme)}
+.btn.rec.on .dot{background:#fff; animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.3}}
+.btn:disabled{opacity:.45; cursor:not-allowed}
+.timer{font-family:var(--f-mono); font-size:13px; color:var(--muted)}
+.recout{display:flex; flex-wrap:wrap; gap:8px; align-items:center; background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:8px 10px}
+.recout audio{height:34px; max-width:100%}
+.codebox{display:flex; flex-wrap:wrap; gap:8px; align-items:center; background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:10px}
+.codebox code{font-family:var(--f-mono); font-size:16px; background:var(--surface-2); padding:6px 10px; border-radius:8px; letter-spacing:.06em; user-select:all}
+.codebox input{font-family:var(--f-mono); font-size:15px; padding:7px 10px; border-radius:8px; border:1px solid var(--line); background:var(--surface-2); color:var(--ink); width:14ch; text-transform:uppercase}
+
+/* Panell lateral */
+.side{display:flex; flex-direction:column; gap:12px; min-width:0}
+.card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:14px; display:flex; flex-direction:column; gap:10px; min-width:0}
+.eyebrow{font-size:11px; text-transform:uppercase; letter-spacing:.09em; font-weight:700; color:var(--muted)}
+.card h2{font-family:var(--f-display); font-weight:800; font-size:24px; line-height:1.05; margin:0; text-wrap:balance}
+.card h3{font-family:var(--f-display); font-weight:800; font-size:18px; margin:0}
+.card p{margin:0}
+.muted{color:var(--muted)}
+.layers{display:flex; flex-direction:column; gap:5px}
+.lrow{display:grid; grid-template-columns:14px 1fr auto; gap:8px; align-items:center; font-size:14px}
+.sw{width:14px; height:14px; border-radius:4px; background:var(--c)}
+.lrow .cnt{display:flex; gap:3px}
+.lrow .cnt i{width:9px; height:9px; border-radius:50%; background:var(--line)}
+.lrow .cnt i.on{background:var(--c)}
+.lrow.off{color:var(--muted)}
+.dens{height:8px; background:var(--surface-2); border-radius:99px; overflow:hidden}
+.dens i{display:block; height:100%; background:var(--style); border-radius:99px; transition:width .2s}
+.feat{margin:0; padding-left:18px; display:flex; flex-direction:column; gap:4px}
+.kv{display:grid; grid-template-columns:auto 1fr; gap:3px 12px; font-size:13.5px}
+.kv dt{color:var(--muted)} .kv dd{margin:0; font-family:var(--f-mono); font-size:13px}
+
+.subtabs{display:flex; gap:4px; flex-wrap:wrap}
+.subtabs button{border:1px solid var(--line); background:var(--surface-2); border-radius:8px; padding:6px 10px; font-weight:700; font-size:13px}
+.subtabs button[aria-pressed="true"]{background:var(--ink); color:var(--bg); border-color:var(--ink)}
+.chal{display:flex; flex-direction:column; gap:7px}
+.ch{border:1px solid var(--line); border-radius:12px; padding:9px 11px; display:grid; grid-template-columns:1fr auto; gap:2px 10px; align-items:center}
+.ch b{font-size:14.5px}
+.ch span{font-size:13px; color:var(--muted); grid-column:1}
+.ch .st{grid-row:1 / span 2; grid-column:2; font-family:var(--f-mono); font-size:12px; padding:3px 8px; border-radius:99px; background:var(--surface-2); color:var(--muted); white-space:nowrap}
+.ch.done{border-color:var(--ok); background:var(--ok-bg)}
+.ch.done .st{background:var(--ok); color:#fff}
+.ch.now{box-shadow:inset 3px 0 0 var(--ok)}
+.fb{border-radius:10px; padding:9px 11px; font-size:14px; display:flex; flex-direction:column; gap:4px}
+.fb.ok{background:var(--ok-bg); color:var(--ok)}
+.fb.bad{background:var(--bad-bg); color:var(--bad)}
+.fb ul{margin:0; padding-left:18px; color:var(--ink)}
+.row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+.opts{display:grid; grid-template-columns:1fr 1fr; gap:6px}
+.opts button{border:1px solid var(--line); background:var(--surface-2); border-radius:10px; padding:10px; font-family:var(--f-display); font-weight:800; font-size:16px}
+.opts button.right{background:var(--ok); color:#fff; border-color:var(--ok)}
+.opts button.wrong{background:var(--bad); color:#fff; border-color:var(--bad)}
+
+/* Paleta: enganxada a sota de l'escenari, una columna per capa */
+.palette{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; background:var(--surface); border:1px solid var(--line); border-top:0; border-radius:0 0 20px 20px; padding:10px; margin-top:-12px}
+.prow{display:flex; flex-direction:column; gap:5px; min-width:0}
+.phead b{font-family:var(--f-display); font-weight:800; font-size:14px; color:var(--c); display:flex; align-items:center; gap:6px; text-transform:uppercase; letter-spacing:.04em}
+.chips{display:flex; flex-direction:column; gap:5px}
+.chip{border:2px solid var(--c); background:var(--surface); border-radius:10px; padding:5px 6px; display:flex; align-items:center; gap:6px; text-align:left; touch-action:none; user-select:none; -webkit-user-select:none; min-width:0}
+.chip .g{width:20px; height:20px; flex:none; border-radius:6px; background:var(--c); color:#fff; display:grid; place-items:center; font-size:11px; font-weight:700}
+.chip .t{font-weight:700; font-size:12.5px; line-height:1.15; overflow-wrap:anywhere; min-width:0}
+.chip:hover{background:color-mix(in srgb, var(--c) 12%, var(--surface))}
+.chip.used{opacity:.35; border-style:dashed}
+.ghost{position:fixed; z-index:80; pointer-events:none; transform:translate(-50%,-50%) rotate(-3deg); box-shadow:0 10px 24px rgba(0,0,0,.25)}
+
+.toast{position:fixed; z-index:90; left:50%; bottom:calc(18px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%); background:var(--ink); color:var(--bg); padding:10px 16px; border-radius:12px; font-weight:700; max-width:calc(100% - 32px); text-align:center}
+.plus{position:fixed; z-index:91; font-family:var(--f-display); font-weight:800; font-size:28px; color:var(--melodia); pointer-events:none; animation:rise 1.2s ease-out forwards}
+@keyframes rise{to{transform:translateY(-60px); opacity:0}}
+.hint{font-size:13px; color:var(--muted)}
+
+/* Tempo */
+.tempo{display:flex; align-items:center; gap:8px; background:var(--surface); border-radius:10px; padding:6px 10px}
+.tempo label{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:700}
+.tempo input{width:110px; accent-color:var(--style)}
+.tempo output{font-family:var(--f-mono); font-size:13px; min-width:6.5ch}
+
+/* Visor de passos */
+.grid{display:flex; flex-direction:column; gap:3px; overflow-x:auto}
+.grow{display:grid; grid-template-columns:62px repeat(16,minmax(12px,1fr)); gap:2px; align-items:center}
+.grow .lb{font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.cell{height:18px; border-radius:3px; background:var(--surface-2); font-family:var(--f-mono); font-size:9px; display:grid; place-items:center; color:#fff; overflow:hidden}
+.cell.b{box-shadow:inset 2px 0 0 var(--line)}
+.cell.on{background:var(--c)} .cell.soft{background:color-mix(in srgb, var(--c) 45%, var(--surface-2))} .cell.hold{background:color-mix(in srgb, var(--c) 30%, var(--surface-2))}
+.cell.ph{outline:2px solid var(--ink); outline-offset:-1px}
+.grow.hd .cell{background:transparent; color:var(--muted); font-size:10px}
+.slot-ctl button.i{font-style:italic; font-family:Georgia, serif}
+
+/* Tutorial */
+.tour-spot{position:fixed; z-index:70; border-radius:16px; box-shadow:0 0 0 4px var(--style), 0 0 0 9999px rgba(10,10,20,.55); pointer-events:none; transition:all .25s ease}
+.tour-spot.none{box-shadow:0 0 0 9999px rgba(10,10,20,.55); width:0!important; height:0!important}
+.tour-card{position:fixed; z-index:71; left:50%; transform:translateX(-50%); width:min(440px, calc(100% - 32px)); background:var(--surface); color:var(--ink); border-radius:18px; padding:16px 18px; box-shadow:0 18px 40px rgba(0,0,0,.3); display:flex; flex-direction:column; gap:8px}
+.tour-card.top{top:calc(16px + env(safe-area-inset-top,0px))} .tour-card.bottom{bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+.tour-card h3{margin:0; font-family:var(--f-display); font-weight:800; font-size:21px; line-height:1.1}
+.tour-card p{margin:0}
+.tour-card .todo{font-weight:700; color:var(--style)}
+.tour-card .done{font-weight:700; color:var(--ok)}
+.tour-dots{display:flex; gap:4px; flex-wrap:wrap}
+.tour-dots i{width:8px; height:8px; border-radius:50%; background:var(--line)} .tour-dots i.on{background:var(--style)}
+.kbd{font-family:var(--f-mono); font-size:12px; border:1px solid var(--line); border-bottom-width:2px; border-radius:5px; padding:0 5px; background:var(--surface)}
+.shortcuts{font-size:12.5px; color:var(--muted); display:flex; flex-wrap:wrap; gap:6px 14px}
+
+/* ---------- Landing ---------- */
+.landing{max-width:1240px; margin:0 auto; display:flex; flex-direction:column; gap:clamp(48px,8vw,96px); padding-bottom:24px}
+.lnav{display:flex; align-items:center; gap:12px; justify-content:space-between}
+.hero{display:flex; flex-direction:column; gap:22px; padding-top:clamp(16px,4vw,48px)}
+.hero .eyebrow{font-size:13px}
+.hero h1{font-family:var(--f-display); font-weight:800; font-size:clamp(46px,9.5vw,128px); line-height:.92; letter-spacing:-.035em; margin:0; max-width:11ch; text-wrap:balance}
+.hero h1 .colla span:nth-child(1){color:var(--ritme)} .hero h1 .colla span:nth-child(2){color:var(--baix)} .hero h1 .colla span:nth-child(3){color:var(--harmonia)} .hero h1 .colla span:nth-child(4){color:var(--melodia)} .hero h1 .colla span:nth-child(5){color:var(--efectes)}
+.lead{font-size:clamp(17px,2vw,21px); max-width:52ch; margin:0; color:var(--muted)}
+.lead b{color:var(--ink)}
+.cta{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+.bigbtn{border:0; border-radius:999px; padding:16px 26px; font-family:var(--f-display); font-weight:800; font-size:clamp(17px,2vw,20px); display:inline-flex; gap:10px; align-items:center; box-shadow:0 5px 0 rgba(0,0,0,.2)}
+.bigbtn:active{transform:translateY(3px); box-shadow:0 2px 0 rgba(0,0,0,.2)}
+.bigbtn.go{background:var(--style); color:#fff}
+.bigbtn.alt{background:var(--surface); color:var(--ink); border:2px solid var(--ink); box-shadow:0 5px 0 var(--ink)}
+.lstage{position:relative; border-radius:28px; background:linear-gradient(180deg,var(--stage-top),var(--stage-bot)); padding:28px 18px 0; overflow:hidden}
+.lstage::after{content:""; position:absolute; left:0; right:0; bottom:0; height:22%; background:var(--floor); opacity:.55}
+.lchars{position:relative; z-index:1; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:clamp(6px,2vw,28px); max-width:900px; margin:0 auto}
+.lchar{display:flex; flex-direction:column; align-items:center; gap:6px; padding-bottom:18px}
+.lchar .char{max-width:160px}
+.lchar .fig{animation:bob calc(60s/90) ease-in-out infinite alternate}
+.lchar:nth-child(2) .fig{animation-delay:-.17s} .lchar:nth-child(3) .fig{animation-delay:-.33s} .lchar:nth-child(4) .fig{animation-delay:-.5s} .lchar:nth-child(5) .fig{animation-delay:-.08s}
+.lchar .mouth{animation:sing calc(60s/180) ease-in-out infinite alternate}
+@keyframes bob{from{transform:translateY(0)}to{transform:translateY(-10px) scaleY(1.03)}}
+@keyframes sing{from{ry:2px}to{ry:9px}}
+.lchar span{font-family:var(--f-display); font-weight:800; font-size:clamp(12px,1.6vw,17px); color:var(--c); text-transform:uppercase; letter-spacing:.05em}
+.facts{display:flex; flex-wrap:wrap; gap:8px 26px; font-family:var(--f-mono); font-size:14px; color:var(--muted)}
+.facts b{font-family:var(--f-display); font-weight:800; font-size:26px; color:var(--ink); margin-right:6px}
+.lsec{display:flex; flex-direction:column; gap:20px}
+.lsec h2{font-family:var(--f-display); font-weight:800; font-size:clamp(32px,5vw,58px); line-height:1; letter-spacing:-.025em; margin:0; max-width:18ch; text-wrap:balance}
+.lsec .intro{font-size:17px; color:var(--muted); max-width:60ch; margin:0}
+.steps{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; counter-reset:st}
+.stepc{background:var(--surface); border:1px solid var(--line); border-radius:20px; padding:20px; display:flex; flex-direction:column; gap:8px}
+.stepc .num{font-family:var(--f-display); font-weight:800; font-size:54px; line-height:.9; color:var(--style)}
+.stepc h3{font-family:var(--f-display); font-weight:800; font-size:22px; margin:0}
+.stepc p{margin:0; color:var(--muted)}
+.lstyles{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px}
+.lst{border-radius:20px; padding:18px 16px; color:#fff; background:var(--sc); display:flex; flex-direction:column; gap:6px; min-height:220px; text-align:left; border:0}
+.lst .n{font-family:var(--f-display); font-weight:800; font-size:24px; line-height:1}
+.lst .b{font-family:var(--f-mono); font-size:13px; opacity:.9}
+.lst .o{font-size:13.5px; opacity:.92}
+.lst .f{margin-top:auto; font-size:14px; font-weight:700; line-height:1.3}
+.lst:hover{filter:brightness(1.06)}
+.learn{display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:24px; align-items:center}
+.mixer{background:var(--surface); border:1px solid var(--line); border-radius:22px; padding:18px; display:flex; flex-direction:column; gap:8px}
+.mrow{display:grid; grid-template-columns:96px minmax(0,1fr); gap:10px; align-items:center; font-weight:700; font-size:14px}
+.mrow .lane{display:grid; grid-template-columns:repeat(16,1fr); gap:3px}
+.mrow .lane i{height:20px; border-radius:4px; background:var(--surface-2)}
+.mrow .lane i.on{background:var(--c)} .mrow .lane i.h{background:color-mix(in srgb, var(--c) 35%, var(--surface-2))}
+.mixer .cap{font-size:13px; color:var(--muted); margin-top:4px}
+.llist{display:flex; flex-direction:column; gap:14px; margin:0; padding:0; list-style:none}
+.llist li{display:grid; grid-template-columns:14px 1fr; gap:12px; align-items:start}
+.llist li .sw{margin-top:5px}
+.llist b{display:block; font-family:var(--f-display); font-weight:800; font-size:19px}
+.llist span{color:var(--muted)}
+.rgrid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px}
+.rc{background:var(--surface); border:1px solid var(--line); border-radius:20px; padding:20px; display:flex; flex-direction:column; gap:8px}
+.rc .tag{align-self:flex-start; font-family:var(--f-mono); font-size:12px; padding:3px 9px; border-radius:99px; background:var(--surface-2); color:var(--muted)}
+.rc h3{font-family:var(--f-display); font-weight:800; font-size:22px; margin:0}
+.rc p{margin:0; color:var(--muted)}
+.teach{background:var(--ink); color:var(--bg); border-radius:28px; padding:clamp(22px,4vw,44px); display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.2fr); gap:28px}
+.teach h2{color:var(--bg)}
+.teach .intro{color:color-mix(in srgb, var(--bg) 75%, var(--ink))}
+.tlist{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px 22px; margin:0; padding:0; list-style:none}
+.tlist b{display:block; font-family:var(--f-display); font-weight:800; font-size:18px; margin-bottom:2px}
+.tlist span{color:color-mix(in srgb, var(--bg) 72%, var(--ink)); font-size:14.5px}
+.tlist code{font-family:var(--f-mono); background:color-mix(in srgb, var(--bg) 15%, var(--ink)); padding:1px 6px; border-radius:5px; color:var(--bg)}
+.final{text-align:center; display:flex; flex-direction:column; align-items:center; gap:18px; padding-block:20px}
+.final h2{font-family:var(--f-display); font-weight:800; font-size:clamp(36px,7vw,84px); line-height:.95; letter-spacing:-.03em; margin:0; text-wrap:balance}
+.lfoot{font-size:13px; color:var(--muted); border-top:1px solid var(--line); padding-top:16px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px}
+@media (max-width:980px){
+  .lstyles{grid-template-columns:repeat(2,minmax(0,1fr))} .lstyles .lst:last-child{grid-column:1 / -1; min-height:0}
+  .learn,.teach{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:720px){
+  .steps,.rgrid,.tlist{grid-template-columns:minmax(0,1fr)}
+  .lst{min-height:0}
+  .mrow{grid-template-columns:70px minmax(0,1fr)}
+}
+.lchar .arm-l{animation:wave calc(60s/90) ease-in-out infinite alternate} .lchar .arm-r{animation:wave2 calc(60s/90) ease-in-out infinite alternate}
+@keyframes wave{to{transform:rotate(26deg)}} @keyframes wave2{to{transform:rotate(-26deg)}}
+@media (prefers-reduced-motion: reduce){ .lchar .fig,.lchar .mouth,.lchar .arm-l,.lchar .arm-r{animation:none} }
+
+@media (max-width:980px){ .main{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:720px){
+  .styles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .styles .stab:last-child{grid-column:1 / -1}
+  .slots{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .palette{grid-template-columns:repeat(5,minmax(108px,1fr)); overflow-x:auto}
+  .prog{margin-left:0; width:100%}
+  .bar{flex:1; min-width:0}
+  .logo small{display:none}
+}
+@media (prefers-reduced-motion: reduce){
+  .char .fig{transform:none} .char .eye,.char .pupil{animation:none} .plus{animation:none; opacity:0}
+}
+
+/* ---------- Escenari nocturn (mateix aspecte en tots dos temes) ---------- */
+.stage{--ink:#F3F0FF; --muted:#B8B1E2; --surface:#2C2656; --surface-2:#383070; --line:#4B4388; --empty:#625AA6;
+  --stage-top:#120F27; --stage-bot:#2A2259; --floor:#3A3176; color:var(--ink); color-scheme:dark;
+  background:radial-gradient(120% 80% at 50% 0%, #2B2360 0%, var(--stage-top) 60%), var(--stage-top); box-shadow:inset 0 -1px 0 rgba(255,255,255,.06)}
+.lights{position:absolute; inset:0; pointer-events:none; background:
+  radial-gradient(40% 55% at 12% -8%, color-mix(in srgb, var(--style) 40%, transparent), transparent 70%),
+  radial-gradient(40% 55% at 88% -8%, rgba(150,120,255,.32), transparent 70%)}
+.lights::after{content:""; position:absolute; inset:0; opacity:.5; background-image:radial-gradient(1.2px 1.2px at 20% 30%, #fff8, transparent), radial-gradient(1px 1px at 70% 18%, #fff6, transparent), radial-gradient(1.4px 1.4px at 44% 12%, #fff7, transparent), radial-gradient(1px 1px at 86% 40%, #fff5, transparent), radial-gradient(1px 1px at 8% 52%, #fff5, transparent)}
+.flash{position:absolute; inset:0; pointer-events:none; opacity:0; background:radial-gradient(70% 60% at 50% 100%, color-mix(in srgb, var(--style) 55%, transparent), transparent 75%)}
+.floor{height:78px; opacity:1; background:linear-gradient(180deg, #3A3176 0%, #1D1840 100%); border-top:2px solid color-mix(in srgb, var(--style) 55%, #6E62C9)}
+.floor::before{content:""; position:absolute; inset:0; background:repeating-linear-gradient(90deg, transparent 0 calc(100%/7 - 1px), rgba(255,255,255,.06) calc(100%/7 - 1px) calc(100%/7))}
+.stagebar,.slots,#projBar{position:relative; z-index:1}
+.slot{position:relative}
+.slot > *:not(.beam){position:relative; z-index:1}
+.beam{position:absolute; left:-14%; right:-14%; top:-34px; height:88%; z-index:0; pointer-events:none;
+  background:linear-gradient(180deg, color-mix(in srgb, var(--c) 75%, transparent), transparent 88%);
+  clip-path:polygon(43% 0,57% 0,100% 100%,0 100%); opacity:calc(.07 + var(--lv,0) * .75); filter:blur(1.5px); transition:opacity .08s}
+.slot.muted .beam{opacity:0}
+.slot-name{color:var(--ink)}
+.char .shadow{fill:var(--c); opacity:calc(.28 + var(--lv,0) * .5)}
+.char .arm{fill:var(--c)} .char .armsh{fill:#000; opacity:.14}
+.char .arm-l{transform-box:fill-box; transform-origin:50% 10%; transform:rotate(calc(var(--lv,0) * 30deg))}
+.char .arm-r{transform-box:fill-box; transform-origin:50% 10%; transform:rotate(calc(var(--lv,0) * -30deg))}
+.char .belly{fill:#fff; opacity:.2}
+.char .glyph{fill:#fff; font-family:var(--f-body); font-weight:700; font-size:20px; text-anchor:middle; opacity:.9}
+.ph{border-color:var(--empty); color:var(--empty); background:radial-gradient(60% 40% at 50% 92%, rgba(255,255,255,.07), transparent)}
+.slot.drop{background:color-mix(in srgb, var(--style) 30%, transparent)}
+.slot.reveal .figbtn{cursor:help}
+.play{box-shadow:0 0 0 4px color-mix(in srgb, var(--style) 30%, transparent), 0 4px 0 rgba(0,0,0,.3)}
+.bar{background:color-mix(in srgb, var(--surface) 85%, transparent)}
+.startov{background:color-mix(in srgb, #120F27 60%, transparent)}
+.startov p{color:var(--ink)}
+.palette{border-top:0; box-shadow:0 -1px 0 color-mix(in srgb, var(--style) 55%, #6E62C9)}
+.chip{background:linear-gradient(180deg, color-mix(in srgb, var(--c) 12%, var(--surface)), var(--surface)); box-shadow:0 3px 0 color-mix(in srgb, var(--c) 45%, transparent); transition:transform .1s, box-shadow .1s}
+.chip:hover{transform:translateY(-2px); box-shadow:0 5px 0 color-mix(in srgb, var(--c) 45%, transparent)}
+.chip:active{transform:translateY(2px); box-shadow:0 1px 0 color-mix(in srgb, var(--c) 45%, transparent)}
+.chip.used{filter:grayscale(.7); box-shadow:none; transform:none}
+.stab{transition:transform .12s}
+.stab:hover:not(:disabled){transform:translateY(-2px)}
+.stab[aria-pressed="true"]{background:var(--sc); border-color:var(--sc); box-shadow:0 4px 0 color-mix(in srgb, var(--sc) 55%, #000)}
+.stab[aria-pressed="true"] .n{color:#fff} .stab[aria-pressed="true"] .m{color:rgba(255,255,255,.85)}
+.card h2{text-decoration:underline; text-decoration-color:var(--style); text-decoration-thickness:4px; text-underline-offset:5px}
+@media (prefers-reduced-motion: reduce){ .beam{transition:none} .chip,.stab{transition:none} }
+
+/* ---------- Mode professor ---------- */
+#projBar{display:grid; grid-template-columns:2fr 1fr 1fr 1.3fr 1.6fr; gap:8px; margin-top:12px}
+.pj{background:color-mix(in srgb, var(--surface) 80%, transparent); border-radius:14px; padding:10px 14px; display:flex; flex-direction:column; gap:2px; min-width:0}
+.pj .k{font-size:11px; text-transform:uppercase; letter-spacing:.09em; color:var(--muted); font-weight:700}
+.pj .v{font-family:var(--f-display); font-weight:800; font-size:clamp(22px,3.2vw,40px); line-height:1.05; overflow-wrap:anywhere}
+.pj .v.mono{font-family:var(--f-mono); font-weight:500}
+.wrap.proj{max-width:none}
+.wrap.proj .styles,.wrap.proj .side,.wrap.proj .actions,.wrap.proj .shortcuts,.wrap.proj .recout,.wrap.proj .codebox,.wrap.proj #homeBtn,.wrap.proj #tourBtn,.wrap.proj header .seg{display:none}
+.wrap.proj .main{grid-template-columns:minmax(0,1fr)}
+.wrap.proj .figbtn{max-width:180px}
+.wrap.proj .slot-name{font-size:16px}
+.timerbig{font-family:var(--f-mono); font-size:34px; line-height:1}
+.ruleta{font-family:var(--f-display); font-weight:800; font-size:26px; line-height:1.1}
+.numin{font-family:var(--f-mono); font-size:15px; padding:6px 9px; border-radius:8px; border:1px solid var(--line); background:var(--surface-2); color:var(--ink); width:7ch}
+.shareov{position:fixed; inset:0; z-index:85; background:rgba(12,10,28,.82); display:grid; place-items:center; padding:16px}
+.sharebox{background:var(--surface); color:var(--ink); border-radius:24px; padding:clamp(18px,4vw,36px); display:grid; grid-template-columns:auto minmax(0,1fr); gap:28px; align-items:center; max-width:880px; width:100%}
+.qr{background:#fff; padding:14px; border-radius:16px; width:min(300px,70vw); aspect-ratio:1}
+.qr img,.qr canvas{width:100%!important; height:auto!important; display:block}
+.sharebox h2{font-family:var(--f-display); font-weight:800; font-size:clamp(26px,4vw,42px); margin:0; line-height:1}
+.bigcode{font-family:var(--f-mono); font-size:clamp(26px,5vw,48px); letter-spacing:.08em; background:var(--surface-2); border-radius:12px; padding:6px 14px; display:inline-block; user-select:all}
+.urlline{font-family:var(--f-mono); font-size:13px; color:var(--muted); overflow-wrap:anywhere}
+@media (max-width:720px){ #projBar{grid-template-columns:repeat(2,minmax(0,1fr))} #projBar .pj:first-child{grid-column:1 / -1} .sharebox{grid-template-columns:minmax(0,1fr); justify-items:center; text-align:center} }
+</style>
+
+<div class="landing" id="landing" data-style="hh">
+  <nav class="lnav">
+    <div class="logo">Beat<b>Colla</b></div>
+    <button class="btn primary" data-enter="app">Obre l'app</button>
+  </nav>
+
+  <section class="hero">
+    <span class="eyebrow">Música per capes · 1r d'ESO · en català</span>
+    <h1>Fes música amb la teva <span class="colla"><span>c</span><span>o</span><span>l</span><span>l</span><span>a</span></span>.</h1>
+    <p class="lead">Arrossega sons als personatges i construeix cançons de <b>hip-hop, reggaeton, techno, trap i rumba catalana</b>. No cal saber solfeig: l'aprens tocant.</p>
+    <div class="cta">
+      <button class="bigbtn go" data-enter="app"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3l12 7-12 7z" fill="currentColor"/></svg>Comença a crear</button>
+      <button class="bigbtn alt" data-enter="tour">Fes el tutorial</button>
+    </div>
+    <div class="lstage" aria-hidden="true"><div class="lchars" id="lChars"></div></div>
+    <div class="facts"><span><b>5</b>estils</span><span><b>100</b>sons</span><span><b>7</b>músics a l'escenari</span><span><b>0</b>registres ni descàrregues</span></div>
+  </section>
+
+  <section class="lsec">
+    <span class="eyebrow">Com funciona</span>
+    <h2>Tres passos i ja sona.</h2>
+    <div class="steps">
+      <div class="stepc"><span class="num">1</span><h3>Tria un estil</h3><p>Cada estil té el seu tempo, els seus acords i els seus sons. Tots encaixen entre ells.</p></div>
+      <div class="stepc"><span class="num">2</span><h3>Arrossega sons</h3><p>Deixa'ls sobre els personatges. Cada so entra a temps, al següent pols del compàs.</p></div>
+      <div class="stepc"><span class="num">3</span><h3>Grava i comparteix</h3><p>Enregistra la teva mescla o copia el seu codi per entregar-la al professor.</p></div>
+    </div>
+  </section>
+
+  <section class="lsec">
+    <span class="eyebrow">Cinc estils</span>
+    <h2>De Detroit al barri de Gràcia.</h2>
+    <p class="intro">Cada estil ve amb la seva fitxa: d'on surt, quin tempo té i com el pots reconèixer d'orella.</p>
+    <div class="lstyles" id="lStyles"></div>
+  </section>
+
+  <section class="lsec learn">
+    <div class="mixer" aria-label="Exemple de capes d'un compàs de hip-hop" id="lMixer"></div>
+    <div class="lsec">
+      <span class="eyebrow">Què aprens</span>
+      <h2>La música, capa a capa.</h2>
+      <ul class="llist">
+        <li style="--c:var(--ritme)"><span class="sw"></span><div><b>Ritme i compàs</b><span>Pols, temps forts i semicorxeres en un compàs de 4/4.</span></div></li>
+        <li style="--c:var(--baix)"><span class="sw"></span><div><b>Baix i acords</b><span>Fonamental, tercera i quinta. Progressions com La m – Fa – Do – Sol.</span></div></li>
+        <li style="--c:var(--harmonia)"><span class="sw"></span><div><b>Textura</b><span>Monodia, melodia acompanyada i polifonia, detectades en directe.</span></div></li>
+        <li style="--c:var(--melodia)"><span class="sw"></span><div><b>Melodia</b><span>L'escala pentatònica, i per què sempre sona bé.</span></div></li>
+        <li style="--c:var(--efectes)"><span class="sw"></span><div><b>Tempo i estil</b><span>BPM, caràcter i context històric de cada gènere.</span></div></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="lsec">
+    <span class="eyebrow">Reptes</span>
+    <h2>Juga, escolta i guanya estrelles.</h2>
+    <div class="rgrid">
+      <div class="rc"><span class="tag">+1 ★ cadascun</span><h3>Textures</h3><p>Construeix una monodia, una base rítmica, una polifonia… El repte es marca sol quan ho aconsegueixes.</p></div>
+      <div class="rc"><span class="tag">+3 ★</span><h3>Escolta i reprodueix</h3><p>Sona una mescla misteriosa. Torna-la a construir només d'orella, en tres nivells.</p></div>
+      <div class="rc"><span class="tag">+2 ★</span><h3>Quin estil és?</h3><p>Endevina l'estil fixant-te en el tempo, el bombo i la caixa.</p></div>
+    </div>
+  </section>
+
+  <section class="teach">
+    <div class="lsec">
+      <span class="eyebrow" style="color:inherit; opacity:.7">Per al professorat</span>
+      <h2>Pensat per a l'aula.</h2>
+      <p class="intro">Funciona al navegador, sense comptes ni dades personals dels alumnes.</p>
+    </div>
+    <ul class="tlist">
+      <li><b>Entregues amb un codi</b><span>Cada mescla té un codi curt, com <code>HH-04C____</code>, que la reprodueix exactament.</span></li>
+      <li><b>Gravació d'àudio</b><span>L'alumne grava la seva creació i la desa com a fitxer.</span></li>
+      <li><b>Chromebook i mòbil</b><span>Es fa servir amb ratolí o amb el dit, i també a la pissarra digital.</span></li>
+      <li><b>Tutorial guiat</b><span>17 passos interactius que esperen que l'alumne faci cada acció.</span></li>
+      <li><b>Vista de projector</b><span>Textura, acord i temps del compàs en gran per a la pissarra digital.</span></li>
+      <li><b>Dictat de capes</b><span>Una mescla misteriosa que la classe ha d'endevinar. Revela els sons d'un en un.</span></li>
+      <li><b>QR per a la classe</b><span>Comparteix la teva base: cada alumne l'obre al mòbil i hi afegeix capes.</span></li>
+      <li><b>Ruleta i temporitzador</b><span>Tria qui surt a la pissarra i controla el temps de cada activitat.</span></li>
+    </ul>
+  </section>
+
+  <section class="final">
+    <h2>La teva colla t'espera.</h2>
+    <div class="cta" style="justify-content:center">
+      <button class="bigbtn go" data-enter="app">Comença a crear</button>
+      <button class="bigbtn alt" data-enter="tour">Fes el tutorial</button>
+    </div>
+  </section>
+  <footer class="lfoot"><span>BeatColla · Educació musical · 1r d'ESO</span><span>Sons generats amb síntesi en directe</span></footer>
+</div>
+
+<div class="wrap" id="app" data-style="hh" hidden>
+  <header class="top">
+    <div class="logo">Beat<b>Colla</b><small>Crea música per capes · 1r d'ESO</small></div>
+    <div class="seg" role="group" aria-label="Mode">
+      <button id="modeCrea" aria-pressed="true">Crea</button>
+      <button id="modeRep" aria-pressed="false">Reptes</button>
+      <button id="modeProf" aria-pressed="false">Professor</button>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn primary" id="projExit" hidden>Surt del projector</button>
+    <button class="btn" id="homeBtn">Inici</button>
+    <button class="btn" id="tourBtn">Tutorial</button>
+    <div class="stars" title="Estrelles guanyades als reptes"><span class="s">★</span><span id="starN">0</span></div>
+  </header>
+
+  <nav class="styles" id="styles" aria-label="Estil musical"></nav>
+
+  <div class="main">
+    <div style="display:flex; flex-direction:column; gap:12px; min-width:0">
+      <section class="stage" id="stage" aria-label="Escenari">
+        <div class="lights" aria-hidden="true"></div><div class="flash" id="flash" aria-hidden="true"></div>
+        <div class="stagebar">
+          <button class="play" id="play" aria-label="Reprodueix"></button>
+          <div class="meta"><strong id="mStyle">Hip-hop</strong><span id="mInfo">90 BPM · 4/4 · Do menor</span></div>
+          <div class="tempo" id="tempoBox"><label for="tempo">Tempo</label><input type="range" id="tempo" min="60" max="120" value="90"><output id="tempoOut">90 BPM</output></div>
+          <div class="prog" id="prog" aria-label="Acords del bucle"></div>
+        </div>
+        <div id="projBar" hidden>
+          <div class="pj"><span class="k">Textura</span><span class="v" id="pjTex">Silenci</span></div>
+          <div class="pj"><span class="k">Acord</span><span class="v" id="pjChord">–</span></div>
+          <div class="pj"><span class="k">Temps</span><span class="v mono" id="pjBeat">1</span></div>
+          <div class="pj"><span class="k">Temps restant</span><span class="v mono" id="pjTimer">–</span></div>
+          <div class="pj"><span class="k">Torn</span><span class="v" id="pjTurn" style="font-size:clamp(18px,2.2vw,28px)">–</span></div>
+        </div>
+        <div class="slots" id="slots"></div>
+        <div class="floor"></div>
+        <div class="startov" id="startov">
+          <div>
+            <button id="startBtn"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3l12 7-12 7z" fill="currentColor"/></svg>Comença a tocar</button>
+            <p><button class="btn" id="startTour" style="margin-top:6px">Primer cop? Fes el tutorial</button></p>
+          </div>
+        </div>
+      </section>
+      <section class="palette" id="palette" aria-label="Paleta de sons"></section>
+
+      <div class="actions">
+        <button class="btn rec" id="recBtn"><span class="dot"></span><span id="recLbl">Grava</span></button>
+        <span class="timer" id="recTime" hidden>0:00</span>
+        <button class="btn" id="codeBtn">Codi de la mescla</button>
+        <button class="btn" id="clearBtn">Esborra-ho tot</button>
+      </div>
+      <div class="recout" id="recOut" hidden>
+        <audio id="recAudio" controls></audio>
+        <button class="btn primary" id="saveBtn">Desa l'àudio</button>
+        <span class="hint" id="saveHint"></span>
+      </div>
+      <div class="codebox" id="codeBox" hidden>
+        <span class="muted">El teu codi:</span><code id="codeOut">HH-_______</code>
+        <button class="btn" id="copyBtn">Copia</button>
+        <span class="spacer"></span>
+        <label class="muted" for="codeIn">Carrega un codi:</label>
+        <input id="codeIn" maxlength="10" placeholder="HH-0A_F___" autocomplete="off">
+        <button class="btn" id="loadBtn">Carrega</button>
+      </div>
+    </div>
+
+    <aside class="side" id="side"></aside>
+  </div>
+
+  <div class="shortcuts" aria-label="Dreceres de teclat"><span><span class="kbd">Espai</span> reprodueix / pausa</span><span><span class="kbd">1</span>–<span class="kbd">7</span> silencia un personatge</span><span><span class="kbd">i</span> al personatge: mira què toca</span></div>
+</div>
+
+<div class="shareov" id="shareOv" hidden role="dialog" aria-label="Comparteix la base amb la classe">
+  <div class="sharebox">
+    <div class="qr" id="qr"></div>
+    <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+      <span class="eyebrow">Comparteix amb la classe</span>
+      <h2>Escaneja i continua la base</h2>
+      <p class="muted" style="margin:0">Cada alumne obre la mateixa mescla al seu dispositiu i hi afegeix les seves capes.</p>
+      <div><span class="bigcode" id="shareCode">HH-_______</span></div>
+      <div class="urlline" id="shareUrl"></div>
+      <div class="row"><button class="btn" id="shareCopy">Copia l'enllaç</button><button class="btn primary" id="shareClose">Tanca</button></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+(() => {
+/* ---------- Teoria ---------- */
+const MINOR=[0,2,3,5,7,8,10], PENT=[0,3,5,7,10];
+const NOTE=['Do','Do♯','Re','Mi♭','Mi','Fa','Fa♯','Sol','La♭','La','Si♭','Si'];
+const QUAL=['m','dim','','m','m','',''];
+const CT={'1':0,'3':2,'5':4,'7':6,'8':7};
+const mtof=m=>440*Math.pow(2,(m-69)/12);
+const scaleM=(b,d)=>b+MINOR[((d%7)+7)%7]+12*Math.floor(d/7);
+const pentM=(b,i)=>b+PENT[i%5]+12*Math.floor(i/5);
+
+const LAYERS={
+  ritme:{name:'Ritme',g:'●',desc:'Bateria i percussió: marquen el pols.',rev:.04,dly:0},
+  baix:{name:'Baix',g:'▬',desc:'Notes greus que sostenen els acords.',rev:0,dly:0},
+  harmonia:{name:'Harmonia',g:'≡',desc:'Acords: diverses notes alhora.',rev:.28,dly:0},
+  melodia:{name:'Melodia',g:'∿',desc:'La línia que es pot cantar.',rev:.22,dly:.1},
+  efectes:{name:'Efectes',g:'✦',desc:'Sons especials que donen color.',rev:.3,dly:.12}
+};
+const LKEYS=Object.keys(LAYERS);
+
+function P(s,len){s=s.replace(/[\s|]/g,'');const L=len||(s.length<=16?16:s.length<=32?32:64);return s.padEnd(L,'.').slice(0,L);}
+const S=(layer,name,kind,o)=>Object.assign({layer,name,kind},o);
+
+/* ---------- Estils i sons ---------- */
+const STYLES={
+ hh:{name:'Hip-hop',code:'HH',bpm:90,swing:.22,key:'Do menor',mel:60,chord:48,bass:36,prog:[0,3,5,4],accent:'#F0703A',
+  kit:{kn:'C1',kd:.5},origin:'Bronx (Nova York), anys 70',
+  about:'Els DJ repetien els trossos instrumentals dels discos perquè la gent ballés, i els MC rimaven a sobre.',
+  features:['Bombo i caixa «boom bap»: la caixa cau als temps 2 i 4.','Swing: les semicorxeres sonen desiguals, «gronxades».','Scratch: el DJ mou el disc endavant i endarrere.'],
+  sounds:[
+   S('ritme','Boom bap','drums',{tracks:{kick:'x.........x.x... x.....x...x.....',snare:'....x.......x... ....x.......x..o'}}),
+   S('ritme','Hi-hats','drums',{tracks:{hat:'x.o.x.o.x.o.x.ox'}}),
+   S('ritme','Beatbox','drums',{tracks:{bkick:'x......x..x..... x.....x...x.....',bsnare:'....x.......x...',bhat:'..x...x...x...x.'}}),
+   S('ritme','Rim i shaker','drums',{tracks:{rim:'......x.......x.',shaker:'o.x.o.x.o.x.o.x.'}}),
+   S('baix','Baix greu','bass',{synth:'sub',p:'1-------..1.5-.. 1-------..8.5-..'}),
+   S('baix','Baix funky','bass',{synth:'pluckb',p:'1..1..8.1.3..5.. 1..1..8.1.5.3.1.'}),
+   S('baix','Baix caminant','bass',{synth:'pluckb',p:'1-..3-..5-..8-..'}),
+   S('baix','808','bass',{synth:'808',p:'1-----..1-....5-'}),
+   S('harmonia','Piano elèctric','chords',{synth:'keys',sev:true,p:'x-----..x-......'}),
+   S('harmonia','Cor «aah»','chords',{synth:'choir',p:'x---------------'}),
+   S('harmonia','Corda (pad)','chords',{synth:'pad',p:'x---------------'}),
+   S('harmonia','Acords curts','chords',{synth:'stab',sev:true,p:'......x.......x.',dly:.2}),
+   S('melodia','Flauta lo-fi','lead',{synth:'flute',p:'7-.5.4-.3---.... 5-.4.3-.2---.... 7-.8.7-.5---.... 4-.3.2-.0-------'}),
+   S('melodia','Campanes','lead',{synth:'bell',p:'5...7...8...7.5. 5...4...3...2...'}),
+   S('melodia','Xiulet','lead',{synth:'whistle',p:'a-------9-7-5--- a-------c-a-9---'}),
+   S('melodia','Sintetitzador','lead',{synth:'saw',p:'0.0.2.3.....3.2. 0.0.2.3.5...4.3.'}),
+   S('efectes','Scratch','fx',{fx:'scratch',p:'............x.x. ........x...x.x.'}),
+   S('efectes','Veu «yeah»','fx',{fx:'vox',vowel:'e',p:'....7-......5...'}),
+   S('efectes','Vinil','fx',{fx:'crackle',p:'xxxxxxxxxxxxxxxx',rev:0}),
+   S('efectes','Impacte','fx',{fx:'impact',p:'x',len:64})
+  ]},
+ rg:{name:'Reggaeton',code:'RG',bpm:95,swing:0,key:'La menor',mel:57,chord:57,bass:45,prog:[0,5,2,6],accent:'#E2457E',
+  kit:{kn:'B0',kd:.4},origin:'Puerto Rico i Panamà, anys 90',
+  about:'Barreja el dancehall jamaicà amb el rap en castellà. Avui sona a tot el món.',
+  features:['Ritme dembow: la caixa agrupa les semicorxeres en 3 + 3 + 2.','Bombo a cada temps del compàs.','Acords repetits en bucle: La m – Fa – Do – Sol.'],
+  sounds:[
+   S('ritme','Dembow','drums',{tracks:{kick:'x...x...x...x...',snare:'...x..x....x..x.'}}),
+   S('ritme','Hi-hats','drums',{tracks:{hat:'x.o.x.o.x.o.x.o.',ohat:'..............x.'}}),
+   S('ritme','Timbales','drums',{tracks:{conga:'..o.x..x..o.x.x.',tom:'x.....x.........'}}),
+   S('ritme','Pandereta','drums',{tracks:{tamb:'....x.......x...',shaker:'o.xoo.xoo.xoo.xo'}}),
+   S('baix','808 dembow','bass',{synth:'808',p:'1..1..1.1..1..1.'}),
+   S('baix','Baix sintètic','bass',{synth:'pluckb',p:'1...1...5...8.5.'}),
+   S('baix','Sub llarg','bass',{synth:'sub',p:'1---------------'}),
+   S('baix','Baix saltant','bass',{synth:'pluckb',p:'1.1..8.1.1..5.3.'}),
+   S('harmonia','Guitarra','chords',{synth:'guitar',p:'x..x..x.x..x..x.'}),
+   S('harmonia','Piano','chords',{synth:'piano',p:'x...x...x..x.x..'}),
+   S('harmonia','Pad càlid','chords',{synth:'pad',p:'x---------------'}),
+   S('harmonia','Synth perreo','chords',{synth:'stab',p:'..x...x...x...x.'}),
+   S('melodia','Marimba','lead',{synth:'marimba',p:'5.7.8.7.5.4.3.4. 5.7.8.a.8.7.5...'}),
+   S('melodia','Synth lead','lead',{synth:'saw',p:'8-.7.5-.7-.5.4-. 5-.4.3-.4.5----- 8-.7.5-.7-.5.4-. 3-.2.0-.2.0-----'}),
+   S('melodia','Flauta','lead',{synth:'flute',oct:12,p:'5---4-3-5---.... 7---5-4-3---....'}),
+   S('melodia','Veu «ooh»','lead',{synth:'vocal',p:'5-------4---3--- 5-------7---8--- a-------8---7--- 5---------------'}),
+   S('efectes','Botzina','fx',{fx:'horn',p:'................ ................ ................ x.x.x---........'}),
+   S('efectes','Sirena','fx',{fx:'siren',p:'................ ................ x-------........',len:64}),
+   S('efectes','«Hey!»','fx',{fx:'vox',vowel:'e',hey:true,p:'............x...'}),
+   S('efectes','Làser','fx',{fx:'zap',p:'...............x ...........x.x.x'})
+  ]},
+ tc:{name:'Techno',code:'TC',bpm:126,swing:0,key:'Fa menor',mel:65,chord:53,bass:41,prog:[0,0,5,6],accent:'#1AA3C4',
+  kit:{kn:'C1',kd:.32},origin:'Detroit (EUA), anys 80',
+  about:'Música feta amb caixes de ritmes i sintetitzadors, pensada per ballar durant hores.',
+  features:['Bombo a cada temps: «four-on-the-floor».','Hi-hat obert a contratemps.','Repetició hipnòtica i canvis molt graduals.'],
+  sounds:[
+   S('ritme','Bombo 4x4','drums',{tracks:{kick:'x...x...x...x...'}}),
+   S('ritme','Hi-hat obert','drums',{tracks:{ohat:'..x...x...x...x.'}}),
+   S('ritme','Clap','drums',{tracks:{clap:'....x.......x...'}}),
+   S('ritme','Hats ràpids','drums',{tracks:{hat:'xoooxoooxoooxoxo'}}),
+   S('baix','Contratemps','bass',{synth:'pluckb',p:'..1-..1-..1-..1-'}),
+   S('baix','Acid 303','bass',{synth:'acid',p:'1.18.1.31.85.1.8 1.18.1.31.8.5.31'}),
+   S('baix','Rumble','bass',{synth:'reese',p:'1--1--1-1--1--1-'}),
+   S('baix','Polsació','bass',{synth:'pluckb',p:'1111111111111111'}),
+   S('harmonia','Stab','chords',{synth:'stab',p:'x.....x.....x...',dly:.15}),
+   S('harmonia','Pad fosc','chords',{synth:'pad',p:'x---------------'}),
+   S('harmonia','Acord dub','chords',{synth:'stab',p:'...x.......x....',dly:.5,rev:.4}),
+   S('harmonia','Arpegi','arp',{synth:'pluck',p:'1358135813581358'}),
+   S('melodia','Seqüència','lead',{synth:'saw',oct:-12,p:'0.0.3.0.0.4.0.3.'}),
+   S('melodia','Campana','lead',{synth:'bell',p:'5.......4.....3. 5.......7...6...'}),
+   S('melodia','Lead 8 bits','lead',{synth:'chip',p:'0.3.5.3.0.3.5.7. 5.3.0.3.5.3.2.0.'}),
+   S('melodia','Veu robot','lead',{synth:'vocal',p:'5--------------- 4-------3------- 5--------------- 7-------6-------'}),
+   S('efectes','Pujada','fx',{fx:'riser',p:'................ ................ x--------------- ----------------'}),
+   S('efectes','Làser','fx',{fx:'zap',p:'..............x.'}),
+   S('efectes','Impacte','fx',{fx:'impact',p:'x',len:64}),
+   S('efectes','Eco percussiu','drums',{tracks:{rim:'x.....x.....x...'},dly:.6,rev:.2})
+  ]},
+ tr:{name:'Trap',code:'TR',bpm:140,swing:0,key:'Re menor',mel:62,chord:50,bass:38,prog:[0,5,3,4],accent:'#8B5CF6',
+  kit:{kn:'C1',kd:.55},origin:'Atlanta (EUA), anys 2000',
+  about:'Ve del rap del sud dels Estats Units. Avui és un dels estils més escoltats pels joves.',
+  features:['Baix 808: molt greu i llarg.','Hi-hats molt ràpids, amb ràfegues.','Caixa al temps 3: sensació de «mig temps» tot i ser ràpid.'],
+  sounds:[
+   S('ritme','Bombo i caixa','drums',{tracks:{kick:'x......x..x..... x.x.......x.....',snare:'........x.......'}}),
+   S('ritme','Hi-hats ràfega','drums',{tracks:{hat:'x.x.x.x.x.x.xrrr x.x.x.x.xxxxx.x.'}}),
+   S('ritme','Clap','drums',{tracks:{clap:'........x......o'}}),
+   S('ritme','Percussió','drums',{tracks:{ohat:'..x.......x.....',rim:'.....x.....x..x.'}}),
+   S('baix','808 llarg','bass',{synth:'808',p:'1-------..1-5---'}),
+   S('baix','808 curt','bass',{synth:'808',p:'1..1..1.....1...'}),
+   S('baix','Sub','bass',{synth:'sub',p:'1---------------'}),
+   S('baix','Baix distorsionat','bass',{synth:'reese',p:'1-..1-..1-.1-.1.'}),
+   S('harmonia','Piano fosc','chords',{synth:'piano',p:'x-------x---x---'}),
+   S('harmonia','Cor','chords',{synth:'choir',p:'x---------------'}),
+   S('harmonia','Guitarra','chords',{synth:'guitar',p:'x.....x.....x...'}),
+   S('harmonia','Pad','chords',{synth:'pad',p:'x---------------'}),
+   S('melodia','Campanes','lead',{synth:'bell',p:'5.....3.....4.3. 5.....3.....2.0.'}),
+   S('melodia','Flauta trap','lead',{synth:'flute',p:'7-.5.4-.5-.4.3-. 4-.............. 7-.5.4-.5-.4.3-. 2-..0-..........'}),
+   S('melodia','Pizzicato','lead',{synth:'pluck',p:'0.3.5.3.0.3.5.7. 0.3.5.3.4.3.2.1.'}),
+   S('melodia','Sintetitzador','lead',{synth:'saw',p:'5---7-5-4---3-2- 0-------........'}),
+   S('efectes','Veu «yeah»','fx',{fx:'vox',vowel:'a',p:'....5-..........'}),
+   S('efectes','Sirena','fx',{fx:'siren',p:'x-------........',len:64}),
+   S('efectes','Plat invers','fx',{fx:'reverse',p:'................ ................ ................ ........x-------'}),
+   S('efectes','Impacte','fx',{fx:'impact',p:'x',len:64})
+  ]},
+ rc:{name:'Rumba catalana',code:'RC',bpm:104,swing:0,key:'La menor',mel:57,chord:57,bass:45,prog:[0,6,5,4],majV:true,accent:'#D4572A',
+  kit:{kn:'D1',kd:.3},origin:'Barcelona (Gràcia, el Raval), anys 50-60',
+  about:'La van crear els gitanos catalans barrejant flamenc, mambo i rock. Peret i el Pescaílla en són els grans noms.',
+  features:['El «ventilador»: la guitarra rasgueja i fa de percussió alhora.','Palmes i bongos marquen el ritme.','Cadència andalusa: La m – Sol – Fa – Mi.'],
+  sounds:[
+   S('ritme','Palmes','drums',{tracks:{clap:'..x.o.x...x.o.x.'}}),
+   S('ritme','Bongos','drums',{tracks:{conga:'x.o.x.oxx.o.x.ox',tom:'....x.......x...'}}),
+   S('ritme','Caixó','drums',{tracks:{kick:'x.....x...x.....',snare:'....x.......x..o'},kit:{sd:.1}}),
+   S('ritme','Maraques','drums',{tracks:{shaker:'oxoxoxoxoxoxoxox'}}),
+   S('baix','Baix rumba','bass',{synth:'pluckb',p:'1...5.1.1...5.1.'}),
+   S('baix','Baix caminant','bass',{synth:'pluckb',p:'1.3.5.3.1.3.5.8.'}),
+   S('baix','Contrabaix','bass',{synth:'sub',p:'1-..5-..1-..5-..'}),
+   S('baix','Baix sincopat','bass',{synth:'pluckb',p:'1..1..5.1..1..5.'}),
+   S('harmonia','Ventilador','chords',{synth:'guitar',p:'x.xx.xx.x.xx.xx.'}),
+   S('harmonia','Guitarra rasguejada','chords',{synth:'guitar',p:'x...x.x.x...x.x.'}),
+   S('harmonia','Piano mambo','chords',{synth:'piano',p:'x..x..x...x..x..'}),
+   S('harmonia','Acordió','chords',{synth:'organ',p:'x---x---x---x---'}),
+   S('melodia','Trompeta','lead',{synth:'brass',p:'5.5.7.5.4---3--- 4.4.5.4.3---2---'}),
+   S('melodia','Veu «ai, ai, ai»','lead',{synth:'vocal',vowel:'a',p:'5-4-3-----...... 7-5-4-----......'}),
+   S('melodia','Flauta','lead',{synth:'flute',p:'a-9-7-5-7-5-4-3- 5-------........'}),
+   S('melodia','Guitarra solista','lead',{synth:'pluckg',p:'5.4.3.4.5.7.8.7. 5.4.3.2.0.......'}),
+   S('efectes','«Olé!»','fx',{fx:'vox',vowel:'e',hey:true,p:'................ ............8...'}),
+   S('efectes','Palmes sordes','drums',{tracks:{clap:'.x.x.x.x.x.x.x.x'},dly:.1}),
+   S('efectes','Castanyoles','drums',{tracks:{rim:'x.rrx...x.rrx...'},rev:.15}),
+   S('efectes','Impacte','fx',{fx:'impact',p:'x',len:64})
+  ]}
+};
+function parseEv(p){const a=new Array(p.length).fill(null);for(let i=0;i<p.length;i++){const c=p[i];if(c==='.'||c==='-')continue;let l=1;while(i+l<p.length&&p[i+l]==='-')l++;a[i]={c,len:l};}return a;}
+for(const [k,st] of Object.entries(STYLES)){
+  st.key_=k;
+  st.sounds.forEach((s,i)=>{s.id=k+i;s.idx=i;s.style=k;
+    if(s.tracks)s.tracks=Object.entries(s.tracks).map(([v,p])=>[v,P(p)]);
+    if(s.p)s.ev=parseEv(P(s.p,s.len));});
+}
+const majV=(st,d)=>st.majV&&((d%7)+7)%7===4;
+const chordTone=(st,base,d,off)=>scaleM(base,d+off)+(majV(st,d)&&off%7===2?1:0);
+const chordName=(st,d)=>{const pc=scaleM(st.chord,d)%12;const q=majV(st,d)?'':QUAL[((d%7)+7)%7];return NOTE[pc]+(q==='m'?' m':q==='dim'?'°':'');};
+
+/* ---------- Àudio ---------- */
+let master,revIn,dlyIn,recorder,limiter;
+let step=0;
+let style=STYLES.hh;
+const slots=[];
+
+function initAudio(){
+  limiter=new Tone.Limiter(-1).toDestination();
+  const comp=new Tone.Compressor({threshold:-16,ratio:3,attack:.01,release:.2}).connect(limiter);
+  master=new Tone.Gain(.85).connect(comp);
+  revIn=new Tone.Reverb({decay:2.6,preDelay:.01,wet:1}).connect(master);
+  dlyIn=new Tone.FeedbackDelay({delayTime:'8n.',feedback:.38,wet:1}).connect(master);
+  recorder=new Tone.Recorder();
+  limiter.connect(recorder);
+  for(let i=0;i<7;i++){
+    const ch=new Tone.Channel().connect(master);
+    const meter=new Tone.Meter({normalRange:true,smoothing:.75,channels:1});
+    ch.connect(meter);
+    const rev=new Tone.Gain(0).connect(revIn), dly=new Tone.Gain(0).connect(dlyIn);
+    ch.connect(rev); ch.connect(dly);
+    slots.push({i,sound:null,inst:null,ch,meter,rev,dly,muted:false,solo:false,start:0,el:null,mouth:null});
+  }
+  Tone.Transport.scheduleRepeat(tick,'16n',0);
+}
+
+const VOWELS={a:[[800,1],[1150,.55],[2900,.25]],e:[[420,1],[2000,.45],[2600,.3]],u:[[340,1],[620,.45],[2400,.12]],o:[[480,1],[820,.5],[2800,.12]]};
+function formant(v,out,N){const inp=N(new Tone.Gain(1));VOWELS[v].forEach(([f,g])=>{const bp=N(new Tone.Filter({type:'bandpass',frequency:f,Q:7}));const gn=N(new Tone.Gain(g*3.2));inp.connect(bp);bp.connect(gn);gn.connect(out);});return inp;}
+
+const SYN={
+  sub(o,N){const d=N(new Tone.Distortion({distortion:.4,wet:.45})).connect(o);const s=N(new Tone.Synth({oscillator:{type:'sine'},envelope:{attack:.01,decay:.2,sustain:.9,release:.15}})).connect(d);s.volume.value=-3;return(f,du,t,v)=>s.triggerAttackRelease(f,du,t,v);},
+  '808'(o,N){const d=N(new Tone.Distortion({distortion:.55,wet:.6})).connect(o);const s=N(new Tone.Synth({oscillator:{type:'sine'},envelope:{attack:.004,decay:.6,sustain:.75,release:.35}})).connect(d);s.volume.value=-3;
+    return(f,du,t,v)=>{s.triggerAttackRelease(f,du,t,v);s.frequency.setValueAtTime(f*2.2,t+.001);s.frequency.exponentialRampToValueAtTime(f,t+.07);};},
+  pluckb(o,N){const s=N(new Tone.MonoSynth({oscillator:{type:'square'},filter:{Q:2,type:'lowpass',rolloff:-24},filterEnvelope:{attack:.002,decay:.18,sustain:.25,release:.2,baseFrequency:110,octaves:3.2},envelope:{attack:.003,decay:.3,sustain:.6,release:.1}})).connect(o);s.volume.value=-9;return(f,du,t,v)=>s.triggerAttackRelease(f,du,t,v);},
+  reese(o,N){const d=N(new Tone.Distortion({distortion:.25,wet:.4})).connect(o);const s=N(new Tone.MonoSynth({oscillator:{type:'fatsawtooth',count:3,spread:35},filter:{Q:2,type:'lowpass',rolloff:-24},filterEnvelope:{attack:.01,decay:.4,sustain:.5,release:.3,baseFrequency:180,octaves:1.8},envelope:{attack:.01,decay:.3,sustain:.8,release:.15}})).connect(d);s.volume.value=-14;return(f,du,t,v)=>s.triggerAttackRelease(f,du,t,v);},
+  acid(o,N){const d=N(new Tone.Distortion({distortion:.3,wet:.4})).connect(o);const s=N(new Tone.MonoSynth({oscillator:{type:'sawtooth'},filter:{Q:9,type:'lowpass',rolloff:-24},filterEnvelope:{attack:.002,decay:.17,sustain:.06,release:.1,baseFrequency:140,octaves:3.8},envelope:{attack:.002,decay:.25,sustain:.5,release:.05}})).connect(d);s.volume.value=-13;return(f,du,t,v)=>s.triggerAttackRelease(f,du,t,v);},
+  pad(o,N){const fl=N(new Tone.Filter(1300,'lowpass')).connect(o);const s=N(new Tone.PolySynth(Tone.Synth,{oscillator:{type:'fatsawtooth',count:2,spread:24},envelope:{attack:.35,decay:.6,sustain:.7,release:1.4}})).connect(fl);s.volume.value=-20;return(f,du,t,v)=>s.triggerAttackRelease(f,du,t,v);},
+  keys(o,N){const s=N(new Tone.PolySynth(Tone.FMSynth,{harmonicity:3,modulationIndex:1.6,oscillator:{type:'sine'},envelope:{attack:.004,decay:1.3,sustain:.25,release:.9},modulation:{type:'sine'},modulationEnvelope:{attack:.004,decay:.5,sustain:.15,release:.5}})).connect(o);s.volume.value=-13;return(f,du,t,v)=>s.triggerAttackRelease(f,du,t,v);},
+  stab(o,N){const fl=N(new Tone.Filter(2000,'lowpass')).connect(o);const s=N(new Tone.PolySynth(Tone.Synth,{oscillator:{type:'square'},envelope:{attack:.002,decay:.16,sustain:0,release:.12}})).connect(fl);s.volume.value=-17;return(f,du,t,v)=>s.triggerAttackRelease(f,du,t,v);},
+  choir(o,N){const fm=formant('a',o,N);const s=N(new Tone.PolySynth(Tone.Synth,{oscillator:{type:'sawtooth'},envelope:{attack:.4,decay:.3,sustain:.85,release:1.2}})).connect(fm);s.volume.value=-15;return(f,du,t,v)=>s.triggerAttackRelease(f,du,t,v);},
+  piano(o,N){const s=N(new Tone.PolySynth(Tone.Synth,{oscillator:{type:'triangle'},envelope:{attack:.003,decay:1.6,sustain:.05,release:1}})).connect(o);s.volume.value=-10;return(f,du,t,v)=>s.triggerAttackRelease(f,du,t,v);},
+  guitar(o,N){const vs=[];for(let i=0;i<6;i++){const p=N(new Tone.PluckSynth({attackNoise:1.2,dampening:3800,resonance:.96})).connect(o);p.volume.value=-3;vs.push(p);}let rr=0;
+    return(f,du,t,v)=>{[].concat(f).forEach((fr,i)=>vs[(rr++)%6].triggerAttack(fr,t+i*.022));};},
+  flute(o,N){const fl=N(new Tone.Filter(2800,'lowpass')).connect(o);const vb=N(new Tone.Vibrato(5,.06)).connect(fl);const s=N(new Tone.Synth({oscillator:{type:'sine'},envelope:{attack:.05,decay:.1,sustain:.8,release:.25}})).connect(vb);s.volume.value=-8;return(f,du,t,v)=>s.triggerAttackRelease(f,du,t,v);},
+  bell(o,N){const s=N(new Tone.PolySynth(Tone.FMSynth,{harmonicity:3.01,modulationIndex:9,envelope:{attack:.001,decay:1.4,sustain:0,release:1.2},modulationEnvelope:{attack:.001,decay:.6,sustain:0,release:.6}})).connect(o);s.volume.value=-15;return(f,du,t,v)=>s.triggerAttackRelease(f,du,t,v);},
+  whistle(o,N){const vb=N(new Tone.Vibrato(6,.1)).connect(o);const s=N(new Tone.Synth({oscillator:{type:'sine'},envelope:{attack:.03,decay:.1,sustain:.9,release:.15}})).connect(vb);s.volume.value=-13;return(f,du,t,v)=>s.triggerAttackRelease(f,du,t,v);},
+  saw(o,N){const s=N(new Tone.MonoSynth({portamento:.03,oscillator:{type:'sawtooth'},filter:{Q:3,type:'lowpass',rolloff:-24},filterEnvelope:{attack:.005,decay:.25,sustain:.3,release:.2,baseFrequency:600,octaves:2.5},envelope:{attack:.005,decay:.2,sustain:.7,release:.12}})).connect(o);s.volume.value=-15;return(f,du,t,v)=>s.triggerAttackRelease(f,du,t,v);},
+  marimba(o,N){const s=N(new Tone.PolySynth(Tone.Synth,{oscillator:{type:'sine'},envelope:{attack:.001,decay:.5,sustain:0,release:.3}})).connect(o);s.volume.value=-5;return(f,du,t,v)=>s.triggerAttackRelease(f,du,t,v);},
+  pluck(o,N){const s=N(new Tone.PolySynth(Tone.Synth,{oscillator:{type:'triangle'},envelope:{attack:.002,decay:.28,sustain:0,release:.2}})).connect(o);s.volume.value=-8;return(f,du,t,v)=>s.triggerAttackRelease(f,du,t,v);},
+  chip(o,N){const s=N(new Tone.Synth({oscillator:{type:'square'},envelope:{attack:.002,decay:.12,sustain:.4,release:.05}})).connect(o);s.volume.value=-22;return(f,du,t,v)=>s.triggerAttackRelease(f,du,t,v);},
+  organ(o,N){const fl=N(new Tone.Filter(2200,'lowpass')).connect(o);const vb=N(new Tone.Vibrato(5.5,.05)).connect(fl);const s=N(new Tone.PolySynth(Tone.Synth,{oscillator:{type:'fatsquare',count:2,spread:12},envelope:{attack:.05,decay:.2,sustain:.8,release:.3}})).connect(vb);s.volume.value=-24;return(f,du,t,v)=>s.triggerAttackRelease(f,du,t,v);},
+  brass(o,N){const s=N(new Tone.MonoSynth({oscillator:{type:'sawtooth'},filter:{Q:1.5,type:'lowpass',rolloff:-24},filterEnvelope:{attack:.04,decay:.3,sustain:.5,release:.2,baseFrequency:400,octaves:3},envelope:{attack:.03,decay:.2,sustain:.8,release:.15}})).connect(o);s.volume.value=-14;return(f,du,t,v)=>s.triggerAttackRelease(f,du,t,v);},
+  pluckg(o,N){const vs=[0,1].map(()=>{const p=N(new Tone.PluckSynth({attackNoise:1.5,dampening:4200,resonance:.97})).connect(o);p.volume.value=-2;return p;});let rr=0;return(f,du,t)=>vs[(rr++)%2].triggerAttack(f,t);},
+  vocal(o,N,snd){const fm=formant(snd&&snd.vowel||'u',o,N);const vb=N(new Tone.Vibrato(5.5,.08)).connect(fm);const s=N(new Tone.Synth({oscillator:{type:'sawtooth'},envelope:{attack:.08,decay:.1,sustain:.9,release:.3}})).connect(vb);s.volume.value=-11;return(f,du,t,v)=>s.triggerAttackRelease(f,du,t,v);}
+};
+
+function drumVoice(name,o,N,kit){
+  const noise=(type,filt,fq,env,vol,q)=>{const f=N(new Tone.Filter({type:filt,frequency:fq,Q:q||1})).connect(o);const n=N(new Tone.NoiseSynth({noise:{type},envelope:Object.assign({attack:.001,sustain:0},env)})).connect(f);n.volume.value=vol;return n;};
+  const memb=(opt,vol)=>{const m=N(new Tone.MembraneSynth(opt)).connect(o);m.volume.value=vol;return m;};
+  switch(name){
+    case 'kick':{const k=memb({pitchDecay:.05,octaves:6,envelope:{attack:.001,decay:kit.kd||.45,sustain:0,release:.1}},-1);return(t,v)=>k.triggerAttackRelease(kit.kn||'C1','8n',t,v);}
+    case 'snare':{const n=noise('white','highpass',1600,{decay:kit.sd||.17},-7);const b=memb({pitchDecay:.01,octaves:2,envelope:{attack:.001,decay:.1,sustain:0}},-12);return(t,v)=>{n.triggerAttackRelease(.15,t,v);b.triggerAttackRelease('G3','16n',t,v);};}
+    case 'clap':{const n=noise('white','bandpass',1400,{decay:.14},-4,.8);return(t,v)=>{n.triggerAttackRelease(.01,t,v*.6);n.triggerAttackRelease(.01,t+.012,v*.6);n.triggerAttackRelease(.13,t+.024,v);};}
+    case 'hat':{const n=noise('white','highpass',7000,{decay:.045},-13);return(t,v)=>n.triggerAttackRelease(.04,t,v);}
+    case 'ohat':{const n=noise('white','highpass',6000,{decay:.28},-17);return(t,v)=>n.triggerAttackRelease(.25,t,v);}
+    case 'rim':{const m=memb({pitchDecay:.005,octaves:1,envelope:{attack:.001,decay:.05,sustain:0}},-9);return(t,v)=>m.triggerAttackRelease('E5','32n',t,v);}
+    case 'shaker':{const n=noise('white','bandpass',5500,{attack:.008,decay:.07},-15);return(t,v)=>n.triggerAttackRelease(.06,t,v);}
+    case 'tamb':{const n=noise('white','highpass',7500,{attack:.002,decay:.13},-13);return(t,v)=>{n.triggerAttackRelease(.1,t,v);};}
+    case 'conga':{const m=memb({pitchDecay:.015,octaves:1.2,envelope:{attack:.001,decay:.22,sustain:0}},-5);return(t,v)=>m.triggerAttackRelease('E3','16n',t,v);}
+    case 'tom':{const m=memb({pitchDecay:.02,octaves:1.6,envelope:{attack:.001,decay:.35,sustain:0}},-5);return(t,v)=>m.triggerAttackRelease('A2','8n',t,v);}
+    case 'bkick':{const m=memb({pitchDecay:.03,octaves:4,envelope:{attack:.001,decay:.25,sustain:0}},-2);const n=noise('pink','lowpass',500,{decay:.06},-10);return(t,v)=>{m.triggerAttackRelease('D1','16n',t,v);n.triggerAttackRelease(.05,t,v);};}
+    case 'bsnare':{const n=noise('pink','bandpass',2500,{attack:.004,decay:.14},-3,.7);return(t,v)=>n.triggerAttackRelease(.12,t,v);}
+    case 'bhat':{const n=noise('white','bandpass',9000,{decay:.03},-10,.8);return(t,v)=>n.triggerAttackRelease(.03,t,v);}
+  }
+  return ()=>{};
+}
+
+const FX={
+  scratch(o,N){const f=N(new Tone.Filter({type:'bandpass',frequency:1500,Q:1.5})).connect(o);const s=N(new Tone.Synth({oscillator:{type:'sawtooth'},envelope:{attack:.005,decay:.05,sustain:.8,release:.03}})).connect(f);s.volume.value=-13;const n=N(new Tone.NoiseSynth({envelope:{attack:.005,decay:.18,sustain:0}})).connect(f);n.volume.value=-16;
+    return(t)=>{s.triggerAttack(220,t);s.frequency.setValueAtTime(220,t+.001);s.frequency.exponentialRampToValueAtTime(880,t+.06);s.frequency.exponentialRampToValueAtTime(160,t+.13);s.frequency.exponentialRampToValueAtTime(700,t+.18);s.triggerRelease(t+.2);n.triggerAttackRelease(.18,t);};},
+  horn(o,N){const fl=N(new Tone.Filter(3500,'lowpass')).connect(o);const d=N(new Tone.Distortion(.5)).connect(fl);const s=N(new Tone.Synth({oscillator:{type:'fatsawtooth',count:3,spread:30},envelope:{attack:.01,decay:.05,sustain:.9,release:.08}})).connect(d);s.volume.value=-19;
+    return(t,du)=>{const f=mtof(pentM(style.mel,5));s.triggerAttackRelease(f,du,t);s.frequency.setValueAtTime(f,t+.001);s.frequency.exponentialRampToValueAtTime(f*.93,t+du);};},
+  siren(o,N){const s=N(new Tone.Synth({oscillator:{type:'triangle'},envelope:{attack:.05,decay:.1,sustain:1,release:.2}})).connect(o);s.volume.value=-17;
+    return(t,du)=>{const f=mtof(style.mel+12);s.triggerAttack(f,t);s.frequency.setValueAtTime(f,t+.001);for(let x=t;x<t+du-.01;x+=.5){s.frequency.linearRampToValueAtTime(f*1.6,x+.25);s.frequency.linearRampToValueAtTime(f,x+.5);}s.triggerRelease(t+du);};},
+  riser(o,N,hp){const f=N(new Tone.Filter({type:hp?'highpass':'bandpass',frequency:400,Q:hp?1:2})).connect(o);const n=N(new Tone.NoiseSynth({noise:{type:'white'},envelope:{attack:.5,decay:.01,sustain:1,release:.06}})).connect(f);n.volume.value=hp?-15:-13;
+    return(t,du)=>{n.envelope.attack=du*.92;f.frequency.setValueAtTime(hp?2500:300,t);f.frequency.exponentialRampToValueAtTime(hp?9000:9000,t+du);n.triggerAttackRelease(du,t);};},
+  reverse(o,N){return FX.riser(o,N,true);},
+  zap(o,N){const s=N(new Tone.Synth({oscillator:{type:'square'},envelope:{attack:.001,decay:.2,sustain:0,release:.05}})).connect(o);s.volume.value=-21;
+    return(t)=>{s.triggerAttackRelease(2400,.2,t);s.frequency.setValueAtTime(2400,t+.001);s.frequency.exponentialRampToValueAtTime(90,t+.2);};},
+  impact(o,N){const m=N(new Tone.MembraneSynth({pitchDecay:.3,octaves:4,envelope:{attack:.001,decay:1.6,sustain:0}})).connect(o);m.volume.value=-3;const fl=N(new Tone.Filter(2500,'lowpass')).connect(o);const n=N(new Tone.NoiseSynth({noise:{type:'brown'},envelope:{attack:.001,decay:1.2,sustain:0}})).connect(fl);n.volume.value=-11;
+    return(t)=>{m.triggerAttackRelease('C1','2n',t);n.triggerAttackRelease(1,t);};},
+  vox(o,N,snd){const fm=formant(snd.vowel||'e',o,N);const s=N(new Tone.Synth({oscillator:{type:'sawtooth'},envelope:{attack:.015,decay:.15,sustain:.6,release:.12}})).connect(fm);s.volume.value=-7;
+    let h=null;if(snd.hey){const f=N(new Tone.Filter({type:'bandpass',frequency:2600,Q:1})).connect(o);h=N(new Tone.NoiseSynth({envelope:{attack:.005,decay:.06,sustain:0}})).connect(f);h.volume.value=-12;}
+    return(t,du,c)=>{const idx=/^[0-9a-e]$/.test(c)?parseInt(c,36):5;const f=mtof(pentM(style.mel,idx));const st=h?t+.05:t;if(h)h.triggerAttackRelease(.05,t);s.triggerAttackRelease(f,Math.max(du,.14),st);s.frequency.setValueAtTime(f*.85,st+.001);s.frequency.exponentialRampToValueAtTime(f,st+.05);};},
+  crackle(o,N){const f=N(new Tone.Filter(2500,'highpass')).connect(o);const n=N(new Tone.NoiseSynth({envelope:{attack:.001,decay:.006,sustain:0}})).connect(f);n.volume.value=-17;
+    return(t,du)=>{if(Math.random()<.55)n.triggerAttackRelease(.004,t+Math.random()*du*.8,.3+Math.random()*.7);};}
+};
+
+function makeInst(snd){
+  const nodes=[];const N=x=>(nodes.push(x),x);
+  const out=new Tone.Gain(1);
+  const inst={out,dispose(){nodes.forEach(n=>{try{n.dispose()}catch(e){}});try{out.dispose()}catch(e){}}};
+  if(snd.kind==='drums'){
+    const kit=Object.assign({},style.kit,snd.kit);
+    const vs={};snd.tracks.forEach(([v])=>vs[v]=drumVoice(v,out,N,kit));
+    inst.hit=(v,t,vel)=>vs[v](t,vel);
+  }else if(snd.kind==='fx'){
+    inst.fx=FX[snd.fx](out,N,snd);
+  }else{
+    inst.play=SYN[snd.synth](out,N,snd);
+  }
+  return inst;
+}
+
+const stepSec=()=>60/Tone.Transport.bpm.value/4;
+function playSlot(sl,s,t,deg){
+  const snd=sl.sound,inst=sl.inst;if(!inst)return;const st=stepSec();
+  if(snd.kind==='drums'){
+    for(const [v,p] of snd.tracks){const c=p[s%p.length];
+      if(c==='x')inst.hit(v,t,.95);else if(c==='o')inst.hit(v,t,.45);
+      else if(c==='r'){for(let k=0;k<3;k++)inst.hit(v,t+k*st/3,.55);}}
+    return;
+  }
+  const ev=snd.ev[s%snd.ev.length];if(!ev)return;
+  const du=ev.len*st*.95;
+  switch(snd.kind){
+    case 'bass':if(CT[ev.c]!=null)inst.play(mtof(chordTone(style,style.bass,deg,CT[ev.c])),du,t,.9);break;
+    case 'chords':{const tones=(snd.sev?[0,2,4,6]:[0,2,4]).map(o=>{let m=chordTone(style,style.chord,deg,o);while(m>=style.chord+15)m-=12;return mtof(m);});inst.play(tones,du,t,ev.c==='o'?.4:.7);break;}
+    case 'arp':if(CT[ev.c]!=null)inst.play(mtof(chordTone(style,style.chord+12,deg,CT[ev.c])),du,t,.6);break;
+    case 'lead':inst.play(mtof(pentM(style.mel+(snd.oct||0),parseInt(ev.c,36))),du,t,.8);break;
+    case 'fx':inst.fx(t,du,ev.c);break;
+  }
+}
+
+function tick(time){
+  const s=step++;
+  const bar=Math.floor(s/16)%4, deg=style.prog[bar];
+  for(const sl of slots){ if(sl.sound&&s>=sl.start){ try{playSlot(sl,s,time,deg)}catch(e){} } }
+  Tone.Draw.schedule(()=>drawStep(s),time);
+  if(listen.playing&&s>=listen.until){listen.until=Infinity;Tone.Draw.schedule(()=>stopListen(),time);}
+}
+
+/* ---------- Estat de la UI ---------- */
+const $=id=>document.getElementById(id);
+const app=$('app');
+let mode='crea', sub='tex', mystery=false, hiddenStyle=false, started=false, inspect=null;
+const listen={target:null,saved:null,playing:false,until:Infinity,level:3,fb:null};
+const quiz={answer:null,picked:null};
+let stars=0, doneTex={};
+try{stars=+localStorage.getItem('beatcolla.stars')||0;doneTex=JSON.parse(localStorage.getItem('beatcolla.tex')||'{}')||{};}catch(e){}
+function saveProgress(){try{localStorage.setItem('beatcolla.stars',stars);localStorage.setItem('beatcolla.tex',JSON.stringify(doneTex));}catch(e){}}
+function addStars(n,el){stars+=n;saveProgress();$('starN').textContent=stars;
+  const r=(el||$('starN')).getBoundingClientRect();const p=document.createElement('div');p.className='plus';p.textContent='+'+n+' ★';p.style.left=(r.left+r.width/2-20)+'px';p.style.top=(r.top-10)+'px';document.body.appendChild(p);setTimeout(()=>p.remove(),1300);}
+
+let toastT;
+function toast(msg){let t=document.querySelector('.toast');if(!t){t=document.createElement('div');t.className='toast';t.setAttribute('role','status');document.body.appendChild(t);}t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,2600);}
+
+async function ensureAudio(){
+  if(Tone.context.state!=='running'){try{await Promise.race([Tone.start(),new Promise(r=>setTimeout(r,400))]);}catch(e){}}
+  if(Tone.context.state!=='running'){$('startov').hidden=false;return;}
+  if(!started){started=true;$('startov').hidden=true;}
+  if(Tone.Transport.state!=='started'){Tone.Transport.start();}
+  renderPlay();
+}
+
+/* ---------- Personatges ---------- */
+function accessory(l){
+  switch(l){
+    case 'ritme':return '<path d="M25 54 Q26 20 60 20 Q94 20 95 54 Z" class="acc"/><path d="M60 50 L108 52 Q108 59 96 59 L60 56 Z" class="acc"/><circle cx="60" cy="22" r="4" class="acc2"/>';
+    case 'baix':return '<path d="M21 66 Q21 16 60 16 Q99 16 99 66" class="accs" stroke-width="7"/><rect x="12" y="54" width="16" height="28" rx="7" class="acc"/><rect x="92" y="54" width="16" height="28" rx="7" class="acc"/>';
+    case 'harmonia':return '<path d="M24 50 Q24 14 60 14 Q96 14 96 50 Z" class="acc"/><rect x="21" y="43" width="78" height="11" rx="5.5" class="acc2"/><circle cx="60" cy="11" r="8" class="acc2"/>';
+    case 'melodia':return '<g class="acc"><circle cx="31" cy="42" r="12"/><circle cx="42" cy="28" r="13"/><circle cx="60" cy="22" r="14"/><circle cx="78" cy="28" r="13"/><circle cx="89" cy="42" r="12"/></g>';
+    case 'efectes':return '<line x1="60" y1="27" x2="60" y2="6" class="accs" stroke-width="4"/><circle cx="60" cy="6" r="6" class="acc2"/><rect x="18" y="56" width="8" height="14" rx="3" class="acc"/><rect x="94" y="56" width="8" height="14" rx="3" class="acc"/>';
+  }return '';
+}
+function charSVG(layer,myst){
+  const face=myst?'<text x="60" y="76" class="q">?</text>'
+   :'<ellipse cx="47" cy="58" rx="7" ry="8" class="eye"/><ellipse cx="73" cy="58" rx="7" ry="8" class="eye"/><circle cx="48" cy="60" r="3.2" class="pupil"/><circle cx="74" cy="60" r="3.2" class="pupil"/><circle cx="37" cy="74" r="5" class="cheek"/><circle cx="83" cy="74" r="5" class="cheek"/><ellipse cx="60" cy="80" rx="8" ry="2" class="mouth"/>';
+  const g=myst?'?':LAYERS[layer].g;
+  return `<svg viewBox="0 0 120 194" class="char" aria-hidden="true"><ellipse cx="60" cy="186" rx="40" ry="6" class="shadow"/><g class="fig">
+   <ellipse cx="45" cy="184" rx="13" ry="6" class="acc"/><ellipse cx="75" cy="184" rx="13" ry="6" class="acc"/>
+   <g class="arm-l"><rect x="13" y="104" width="18" height="50" rx="9" class="arm"/><rect x="13" y="104" width="18" height="50" rx="9" class="armsh"/></g>
+   <g class="arm-r"><rect x="89" y="104" width="18" height="50" rx="9" class="arm"/><rect x="89" y="104" width="18" height="50" rx="9" class="armsh"/></g>
+   <rect x="28" y="96" width="64" height="86" rx="28" class="body"/><rect x="41" y="122" width="38" height="40" rx="15" class="belly"/><text x="60" y="149" class="glyph">${g}</text>
+   <circle cx="60" cy="62" r="36" class="head"/>${myst?'':accessory(layer)}${face}</g></svg>`;
+}
+
+function renderSlot(i){
+  const sl=slots[i],el=$('slots').children[i];
+  el.className='slot';el.removeAttribute('style');
+  if(!sl.sound){
+    el.classList.add('empty');
+    el.innerHTML=`<div class="ph" aria-hidden="true">+</div><div class="slot-name">Lloc ${i+1}</div><div class="slot-layer" style="color:var(--muted)">Lliure</div>`;
+    sl.el=el;sl.mouth=null;sl.fig=null;return;
+  }
+  const snd=sl.sound,L=LAYERS[snd.layer];const my=mystery&&!sl.revealed;
+  el.style.setProperty('--c',my?'var(--mystery)':`var(--${snd.layer})`);
+  if(my&&dictat.active)el.classList.add('reveal');
+  if(sl.muted)el.classList.add('muted');
+  if(sl.solo)el.classList.add('soloed');
+  const nm=my?'???':snd.name, ly=my?'Misteri':L.name;
+  el.innerHTML=`<div class="beam" aria-hidden="true"></div><button class="figbtn" aria-label="${my?(dictat.active?'Revela aquest so':'So misteriós'):(sl.muted?'Activa ':'Silencia ')+snd.name}">${charSVG(snd.layer,my)}</button>
+   <div class="slot-name">${nm}</div><div class="slot-layer">${ly}</div>
+   <div class="slot-ctl" ${mystery?'hidden':''}>
+    <button data-a="m" aria-pressed="${sl.muted}" title="Silencia (mute)" aria-label="Silencia">M</button>
+    <button data-a="s" aria-pressed="${sl.solo}" title="Escolta només aquest (solo)" aria-label="Solo">S</button>
+    <button data-a="i" class="i" aria-pressed="${inspect===i}" title="Mira què toca" aria-label="Mira què toca">i</button>
+    <button data-a="x" title="Treu el so" aria-label="Treu el so">✕</button></div>`;
+  sl.el=el;sl.mouth=el.querySelector('.mouth');sl.fig=el.querySelector('.char');
+}
+function renderSlots(){slots.forEach((_,i)=>renderSlot(i));}
+
+function nextBeat(){return Tone.Transport.state==='started'?Math.ceil(step/4)*4:step;}
+function assign(i,snd){
+  const sl=slots[i];
+  if(sl.inst){sl.inst.dispose();sl.inst=null;}
+  sl.sound=snd;sl.muted=false;sl.solo=false;sl.revealed=false;sl.ch.mute=false;sl.ch.solo=false;
+  if(snd){sl.inst=makeInst(snd);sl.inst.out.connect(sl.ch);const L=LAYERS[snd.layer];sl.rev.gain.value=snd.rev??L.rev;sl.dly.gain.value=snd.dly??L.dly;sl.start=nextBeat();}
+  renderSlot(i);
+}
+function clearAll(){slots.forEach((_,i)=>assign(i,null));}
+function afterChange(){checkTex();renderPalette();renderSide();updateCode();tour.check();}
+
+function slotAction(i,a){
+  const sl=slots[i];if(!sl.sound||mystery)return;
+  if(a==='m'){sl.muted=!sl.muted;sl.ch.mute=sl.muted;}
+  else if(a==='s'){sl.solo=!sl.solo;sl.ch.solo=sl.solo;}
+  else if(a==='x'){assign(i,null);if(inspect===i)inspect=null;}
+  else if(a==='i'){const prev=inspect;inspect=inspect===i?null:i;if(prev!=null&&prev!==i)renderSlot(prev);if(mode!=='crea')setMode('crea');}
+  renderSlot(i);afterChange();
+}
+
+function addSound(snd,slotIdx){
+  if(mystery){toast(dictat.active?'Acaba el dictat per tornar a crear.':listen.playing?'Ara sona el repte. Prem «Torna a la meva mescla».':'Primer respon quin estil és.');return;}
+  const used=slots.findIndex(s=>s.sound&&s.sound.id===snd.id);
+  if(slotIdx==null){
+    if(used>=0){toast(`«${snd.name}» ja sona al lloc ${used+1}.`);return;}
+    slotIdx=slots.findIndex(s=>!s.sound);
+    if(slotIdx<0){toast('Tots els llocs estan ocupats: treu-ne un amb ✕.');return;}
+  }else if(used>=0&&used!==slotIdx){assign(used,null);}
+  assign(slotIdx,snd);ensureAudio();afterChange();
+}
+
+/* ---------- Anàlisi de la textura ---------- */
+function census(){
+  const anySolo=slots.some(s=>s.sound&&s.solo);
+  const c={total:0,filled:0,ritme:0,baix:0,harmonia:0,melodia:0,efectes:0,ids:[]};
+  for(const s of slots){if(!s.sound)continue;c.filled++;
+    if(s.muted||(anySolo&&!s.solo))continue;c.total++;c[s.sound.layer]++;c.ids.push(s.sound.id);}
+  return c;
+}
+function texture(c){
+  const others=c.total-c.melodia;
+  if(c.total===0)return['Silenci','Afegeix sons arrossegant-los als personatges, o toca un so de la paleta.'];
+  if(c.melodia===0&&c.harmonia===0&&c.efectes===0)return['Base rítmica','Hi ha ritme i/o baix, però cap melodia que es pugui cantar.'];
+  if(c.melodia===0)return['Acompanyament','Hi ha acords i ritme, però falta la veu protagonista: la melodia.'];
+  if(c.melodia===1&&others===0)return['Monodia','Una sola línia melòdica, sense cap acompanyament.'];
+  if(c.melodia>=2)return[others?'Polifonia acompanyada':'Polifonia','Dues o més melodies independents sonen alhora'+(others?', amb acompanyament.':'.')];
+  return['Melodia acompanyada','Una melodia principal i, al darrere, un acompanyament de ritme, baix o acords.'];
+}
+
+/* ---------- Reptes ---------- */
+const TEX=[
+  {id:'mono',t:'Monodia',g:'Una sola melodia, sense res més.',ok:c=>c.total===1&&c.melodia===1},
+  {id:'base',t:'Base rítmica',g:'2 sons de Ritme i 1 de Baix. Cap melodia ni acord.',ok:c=>c.ritme>=2&&c.baix>=1&&c.melodia===0&&c.harmonia===0},
+  {id:'acomp',t:'Melodia acompanyada',g:'1 Melodia + Ritme + Baix + Harmonia.',ok:c=>c.melodia===1&&c.ritme>=1&&c.baix>=1&&c.harmonia>=1},
+  {id:'poli',t:'Polifonia',g:'2 melodies diferents alhora, amb acords de fons.',ok:c=>c.melodia>=2&&c.harmonia>=1},
+  {id:'plena',t:'Textura plena',g:'Omple els 7 llocs fent servir les 5 capes.',ok:c=>c.total===7&&LKEYS.every(k=>c[k]>=1)},
+  {id:'solo',t:'Escolta el baix',g:'Amb 4 sons o més, fes servir S per sentir només el baix.',ok:c=>c.filled>=4&&c.total===1&&c.baix===1}
+];
+function checkTex(){
+  if(mystery)return;
+  const c=census();
+  TEX.forEach(x=>{const k=style.key_+':'+x.id;if(!doneTex[k]&&x.ok(c)){doneTex[k]=1;saveProgress();addStars(1);toast('Repte superat: '+x.t+' ★');}});
+}
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function pickMix(st,n){
+  const order=shuffle(['ritme','baix','melodia','harmonia','efectes']);
+  const base=['ritme','baix','melodia'].concat(order.filter(l=>!['ritme','baix','melodia'].includes(l)));
+  return base.slice(0,n).map(l=>{const pool=st.sounds.filter(s=>s.layer===l);return pool[Math.floor(Math.random()*pool.length)];});
+}
+function newTarget(){listen.target=pickMix(style,listen.level);listen.fb=null;}
+function startListen(){
+  if(!listen.target)newTarget();
+  listen.saved=slots.map(s=>s.sound?{snd:s.sound,m:s.muted,so:s.solo}:null);
+  mystery=true;clearAll();listen.target.forEach((s,i)=>assign(i,s));
+  listen.playing=true;ensureAudio();listen.until=nextBeat()+64*2;
+  afterChange();
+}
+function stopListen(){
+  if(!listen.playing)return;
+  listen.playing=false;mystery=false;clearAll();
+  (listen.saved||[]).forEach((x,i)=>{if(x){assign(i,x.snd);const sl=slots[i];sl.muted=x.m;sl.ch.mute=x.m;sl.solo=x.so;sl.ch.solo=x.so;renderSlot(i);}});
+  afterChange();
+}
+function checkListen(){
+  const c=census();const mine=new Set(c.ids);const tgt=listen.target;
+  const miss=[],ok=[];
+  tgt.forEach(s=>{if(mine.has(s.id))ok.push(s);else miss.push(s);});
+  const extra=c.ids.filter(id=>!tgt.some(s=>s.id===id));
+  if(!miss.length&&!extra.length){listen.fb={ok:true,msg:'Perfecte! Has reproduït la mescla.'};addStars(3,$('chkBtn'));}
+  else{
+    const items=[];
+    miss.forEach(s=>{const has=slots.some(x=>x.sound&&x.sound.layer===s.layer&&!x.muted);items.push(has?`A la capa ${LAYERS[s.layer].name} hi ha un so, però no és el correcte.`:`Falta un so de la capa ${LAYERS[s.layer].name}.`);});
+    if(extra.length)items.push(`Sobren ${extra.length} so${extra.length>1?'ns':''}.`);
+    listen.fb={ok:false,msg:`Tens ${ok.length} de ${tgt.length} sons correctes.`,items};
+  }
+  renderSide();
+}
+
+function newQuiz(){
+  if(listen.playing)stopListen();
+  const keys=Object.keys(STYLES);const k=keys[Math.floor(Math.random()*keys.length)];
+  quiz.answer=k;quiz.picked=null;hiddenStyle=true;mystery=true;
+  setStyle(k,true);
+  pickMix(STYLES[k],4).forEach((s,i)=>assign(i,s));
+  ensureAudio();afterChange();renderStyles();
+}
+function answerQuiz(k){
+  if(quiz.picked)return;quiz.picked=k;hiddenStyle=false;mystery=false;
+  if(k===quiz.answer)addStars(2,document.querySelector(`[data-q="${k}"]`));
+  renderSlots();renderStyles();renderMeta();afterChange();
+}
+
+/* ---------- Render ---------- */
+const ICON_PLAY='<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3l12 7-12 7z" fill="currentColor"/></svg>';
+const ICON_PAUSE='<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="3" width="4.5" height="14" rx="1" fill="currentColor"/><rect x="11.5" y="3" width="4.5" height="14" rx="1" fill="currentColor"/></svg>';
+function renderPlay(){tour.check();const on=Tone.Transport.state==='started';$('play').innerHTML=on?ICON_PAUSE:ICON_PLAY;$('play').setAttribute('aria-label',on?'Pausa':'Reprodueix');}
+
+function renderStyles(){
+  $('styles').innerHTML=Object.entries(STYLES).map(([k,st])=>{
+    const cur=k===style.key_;const hid=hiddenStyle;
+    return `<button class="stab" data-k="${k}" style="--sc:${st.accent}" aria-pressed="${cur&&!hid}" ${hid?'disabled':''}><span class="n">${st.name}</span><span class="m">${st.bpm} BPM · ${st.key}</span></button>`;}).join('');
+}
+function renderMeta(){
+  $('mStyle').textContent=hiddenStyle?'Estil misteriós':style.name;
+  $('mInfo').textContent=hiddenStyle?'? BPM · 4/4':`${style.bpm} BPM · 4/4 · ${style.key}${style.swing?' · swing':''}`;
+  $('prog').innerHTML='<span class="proglbl">Acords</span>'+style.prog.map((d,b)=>`<div class="bar" data-b="${b}"><span class="c">${hiddenStyle?'?':chordName(style,d)}</span><span class="beats"><i></i><i></i><i></i><i></i></span></div>`).join('');
+}
+function drawStep(s){
+  if(s%4===0)drawBeat(s);
+  const g=document.getElementById('grid');if(!g)return;
+  g.querySelectorAll('.cell.ph').forEach(c=>c.classList.remove('ph'));
+  const len=+g.dataset.len||16;const k=s%len;const row=Math.floor(k/16),col=k%16;
+  g.querySelectorAll(`.grow[data-r="${row}"] .cell[data-c="${col}"]`).forEach(c=>c.classList.add('ph'));
+}
+function drawBeat(s){
+  const b=Math.floor(s/16)%4,beat=Math.floor(s/4)%4;
+  const fl=$('flash');if(fl&&!reduce&&fl.animate)fl.animate([{opacity:s%16===0?.6:.28},{opacity:0}],{duration:380,easing:'ease-out'});
+  if(prof.proj){$('pjBeat').textContent=beat+1;$('pjChord').textContent=hiddenStyle?'?':chordName(style,style.prog[b]);}
+  document.querySelectorAll('#prog .bar').forEach((el,i)=>{el.classList.toggle('on',i===b);el.querySelectorAll('i').forEach((d,j)=>d.classList.toggle('on',i===b&&j<=beat));});
+}
+
+function renderPalette(){
+  const used=new Set(mystery?[]:slots.filter(s=>s.sound).map(s=>s.sound.id));
+  $('palette').innerHTML=LKEYS.map(l=>{const L=LAYERS[l];
+    const chips=style.sounds.filter(s=>s.layer===l).map(s=>`<button class="chip${used.has(s.id)?' used':''}" data-id="${s.id}" style="--c:var(--${l})"><span class="g" aria-hidden="true">${L.g}</span><span class="t">${hiddenStyle?'???':s.name}</span></button>`).join('');
+    return `<div class="prow" style="--c:var(--${l})" title="${L.desc}"><div class="phead"><b>${L.name}</b></div><div class="chips">${chips}</div></div>`;}).join('');
+}
+
+function layerRows(c){
+  return LKEYS.map(l=>`<div class="lrow ${c[l]?'':'off'}" style="--c:var(--${l})"><span class="sw"></span><span>${LAYERS[l].name}</span><span class="cnt">${[0,1,2,3].map(k=>`<i class="${k<c[l]?'on':''}"></i>`).join('')}</span></div>`).join('');
+}
+const VOICE={kick:'Bombo',snare:'Caixa',clap:'Palmes',hat:'Charles',ohat:'Charles obert',rim:'Aro',shaker:'Maraca',tamb:'Pandereta',conga:'Bongo',tom:'Tom',bkick:'Bombo (boca)',bsnare:'Caixa (boca)',bhat:'Charles (boca)'};
+const SOLF=['Do','Do♯','Re','Mi♭','Mi','Fa','Fa♯','Sol','La♭','La','Si♭','Si'];
+function gridCard(){
+  const sl=inspect!=null?slots[inspect]:null;if(!sl||!sl.sound||mystery)return '';
+  const snd=sl.sound,L=LAYERS[snd.layer];
+  const head=`<div class="grow hd" data-r="-1"><span class="lb"></span>${Array.from({length:16},(_,k)=>`<span class="cell">${k%4===0?k/4+1:''}</span>`).join('')}</div>`;
+  const rows=[];let len=16;
+  const mk=(lb,p,r,fn)=>`<div class="grow" data-r="${r}"><span class="lb" title="${lb}">${lb}</span>${[...p].map((c,k)=>fn(c,k)).join('')}</div>`;
+  if(snd.kind==='drums'){
+    len=Math.max(...snd.tracks.map(([,p])=>p.length));
+    for(let r=0;r<len/16;r++)snd.tracks.forEach(([v,p])=>{const seg=p.repeat(len/p.length).slice(r*16,r*16+16);
+      rows.push(mk((len>16?`C${r+1} `:'')+(VOICE[v]||v),seg,r,(c,k)=>`<span class="cell${k%4===0?' b':''}${c==='x'||c==='r'?' on':c==='o'?' soft':''}" data-c="${k}">${c==='r'?'3':''}</span>`));});
+  }else{
+    const p=P(snd.p,snd.len);len=p.length;
+    const lab=(c,r)=>{if(c==='.'||c==='-')return '';
+      if(snd.kind==='lead'){const m=pentM(style.mel+(snd.oct||0),parseInt(c,36));return isNaN(m)?'':SOLF[m%12].slice(0,2);}
+      if(snd.kind==='bass'||snd.kind==='arp')return c;
+      if(snd.kind==='chords')return '';
+      return '';};
+    for(let r=0;r<len/16;r++){const seg=p.slice(r*16,r*16+16);
+      rows.push(mk(`Compàs ${r+1}`,seg,r,(c,k)=>`<span class="cell${k%4===0?' b':''}${c==='-'?' hold':c!=='.'?' on':''}" data-c="${k}">${lab(c,r)}</span>`));}
+  }
+  const expl={drums:'Cada casella és una semicorxera: 16 caselles fan un compàs de 4/4. «3» vol dir una ràfega de tres cops.',
+    bass:'Els números són notes de l\'acord: 1 = fonamental, 3 = tercera, 5 = quinta, 8 = octava. Les caselles clares allarguen la nota.',
+    chords:'Cada casella plena és un acord (tres o quatre notes alhora). Les clares mantenen l\'acord.',
+    arp:'Un arpegi toca les notes de l\'acord una darrere l\'altra: 1, 3, 5, 8.',
+    lead:'Les notes surten de l\'escala pentatònica: per això sempre sonen bé juntes.',
+    fx:'Els efectes sonen en moments concrets del bucle per donar color.'}[snd.kind];
+  return `<div class="card" style="--c:var(--${snd.layer})"><div class="row" style="justify-content:space-between"><span class="eyebrow">Què toca · lloc ${inspect+1}</span><button class="btn" data-close="1" style="padding:3px 9px">Tanca</button></div>
+    <h3 style="color:var(--${snd.layer})">${snd.name} <span class="muted" style="font-family:var(--f-body);font-size:13px;font-weight:400">${L.name}</span></h3>
+    <div class="grid" id="grid" data-len="${len}">${head}${rows.join('')}</div><p class="hint">${expl}</p></div>`;
+}
+function styleCard(){
+  return `<div class="card"><span class="eyebrow">Fitxa de l'estil</span><h3 style="color:${style.accent}">${style.name}</h3>
+  <dl class="kv"><dt>Origen</dt><dd>${style.origin}</dd><dt>Tempo</dt><dd>${style.bpm} BPM</dd><dt>Compàs</dt><dd>4/4</dd><dt>Tonalitat</dt><dd>${style.key}</dd></dl>
+  <p class="muted">${style.about}</p><span class="eyebrow">Com el reconeixes</span><ul class="feat">${style.features.map(f=>`<li>${f}</li>`).join('')}</ul></div>`;
+}
+function renderSide(){
+  const side=$('side');const c=census();
+  $('pjTex').textContent=mystery&&dictat.active?'Misteri':texture(c)[0];
+  if(mode==='prof'){side.innerHTML=profPanel();return;}
+  if(mode==='crea'){
+    const [tn,td]=texture(c);
+    side.innerHTML=gridCard()+`<div class="card"><span class="eyebrow">Què sona ara · textura</span><h2>${tn}</h2><p class="muted">${td}</p>
+      <div class="layers">${layerRows(c)}</div>
+      <div><div class="row" style="justify-content:space-between"><span class="eyebrow">Densitat</span><span class="eyebrow">${c.total} / 7</span></div><div class="dens"><i style="width:${c.total/7*100}%"></i></div></div></div>`+styleCard();
+    return;
+  }
+  const tabs=`<div class="subtabs" role="group" aria-label="Tipus de repte">
+    <button data-sub="tex" aria-pressed="${sub==='tex'}">Textures</button>
+    <button data-sub="esc" aria-pressed="${sub==='esc'}">Escolta i reprodueix</button>
+    <button data-sub="est" aria-pressed="${sub==='est'}">Quin estil és?</button></div>`;
+  let body='';
+  if(sub==='tex'){
+    const [tn]=texture(c);
+    body=`<p class="muted">Construeix cada textura amb els sons de <b>${style.name}</b>. Quan l'aconsegueixis, es marca sola.</p>
+    <p>Ara sona: <b>${tn}</b></p>
+    <div class="chal">${TEX.map(x=>{const d=doneTex[style.key_+':'+x.id];const now=!mystery&&x.ok(c);return `<div class="ch ${d?'done':''} ${now?'now':''}"><b>${x.t}</b><span>${x.g}</span><span class="st">${d?'Fet ★':'+1 ★'}</span></div>`;}).join('')}</div>`;
+  }else if(sub==='esc'){
+    const fb=listen.fb?`<div class="fb ${listen.fb.ok?'ok':'bad'}"><b>${listen.fb.msg}</b>${listen.fb.items?'<ul>'+listen.fb.items.map(i=>`<li>${i}</li>`).join('')+'</ul>':''}</div>`:'';
+    const hint=listen.showHint&&listen.target?`<p class="hint">Pista: hi ha ${listen.target.map(s=>LAYERS[s.layer].name).join(', ')}.</p>`:'';
+    body=`<p class="muted">Escolta una mescla misteriosa de <b>${style.name}</b> i torna-la a construir amb la paleta.</p>
+    <div class="row"><span class="eyebrow">Nivell</span><div class="seg" role="group" aria-label="Nivell">${[[2,'Fàcil'],[3,'Mitjà'],[4,'Difícil']].map(([n,t])=>`<button data-lvl="${n}" aria-pressed="${listen.level===n}">${t}</button>`).join('')}</div></div>
+    <div class="row">${listen.playing?`<button class="btn primary" id="backBtn">Torna a la meva mescla</button>`:`<button class="btn primary" id="lisBtn">${listen.target?'Torna a escoltar':'Escolta el repte'}</button>`}
+      <button class="btn" id="newT">Nou repte</button></div>
+    ${listen.playing?'<p class="hint">Sona el repte (2 voltes). Després tornarà la teva mescla.</p>':''}
+    <div class="row"><button class="btn" id="chkBtn" ${!listen.target||listen.playing?'disabled':''}>Comprova</button><button class="btn" id="hintBtn" ${!listen.target?'disabled':''}>Pista</button></div>
+    ${hint}${fb}`;
+  }else{
+    const q=quiz.answer;
+    let res='';
+    if(quiz.picked){const st=STYLES[q];const right=quiz.picked===q;
+      res=`<div class="fb ${right?'ok':'bad'}"><b>${right?'Correcte!':'No és '+STYLES[quiz.picked].name+'. Era '+st.name+'.'}</b><ul>${st.features.map(f=>`<li>${f}</li>`).join('')}</ul></div>`;}
+    body=`<p class="muted">Sona una mescla d'un estil amagat. Fixa't en el tempo, el bombo i la caixa.</p>
+    <div class="row"><button class="btn primary" id="quizBtn">${q?'Una altra':'Comença'}</button></div>
+    ${q?`<div class="opts">${Object.entries(STYLES).map(([k,st])=>`<button data-q="${k}" class="${quiz.picked?(k===q?'right':(k===quiz.picked?'wrong':'')):''}">${st.name}</button>`).join('')}</div>`:''}${res}`;
+  }
+  side.innerHTML=`<div class="card"><span class="eyebrow">Reptes</span>${tabs}${body}</div>`+(sub==='est'&&quiz.answer&&!quiz.picked?'':styleCard());
+}
+
+function codeOf(){return style.code+'-'+slots.map(s=>s.sound&&!mystery?s.sound.idx.toString(36).toUpperCase():'_').join('');}
+function updateCode(){$('codeOut').textContent=codeOf();}
+function loadCode(str,silent){
+  const m=/^(HH|RG|TC|TR|RC)-([0-9A-J_]{7})$/i.exec(str.trim());
+  if(!m){toast('Codi no vàlid. Ha de ser com HH-0A_F___');return;}
+  const k=Object.keys(STYLES).find(k=>STYLES[k].code===m[1].toUpperCase());
+  if(listen.playing)stopListen();
+  setStyle(k);
+  [...m[2].toUpperCase()].forEach((ch,i)=>{if(ch!=='_'){const s=STYLES[k].sounds[parseInt(ch,36)];if(s)assign(i,s);}});
+  if(!silent)ensureAudio();afterChange();toast('Mescla carregada');
+}
+
+function setStyle(k,keepHidden){
+  if(listen.playing){listen.playing=false;mystery=false;}
+  if(!keepHidden){hiddenStyle=false;mystery=false;dictat.active=false;}
+  style=STYLES[k];app.dataset.style=k;
+  clearAll();
+  Tone.Transport.bpm.value=style.bpm;Tone.Transport.swing=style.swing;Tone.Transport.swingSubdivision='16n';
+  inspect=null;const tp=$('tempo');tp.min=style.bpm-30;tp.max=style.bpm+30;tp.value=style.bpm;$('tempoOut').textContent=style.bpm+' BPM';$('tempoBox').hidden=!!keepHidden;
+  listen.target=null;listen.fb=null;
+  renderStyles();renderMeta();afterChange();
+}
+
+/* ---------- Arrossegar ---------- */
+let drag=null;
+$('palette').addEventListener('pointerdown',e=>{
+  const chip=e.target.closest('.chip');if(!chip||e.button>0)return;
+  drag={chip,id:chip.dataset.id,x:e.clientX,y:e.clientY,ghost:null,over:null};
+});
+document.addEventListener('pointermove',e=>{
+  if(!drag)return;
+  if(!drag.ghost){if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<7)return;
+    drag.ghost=drag.chip.cloneNode(true);drag.ghost.classList.add('ghost');drag.ghost.style.width=drag.chip.offsetWidth+'px';document.body.appendChild(drag.ghost);}
+  drag.ghost.style.left=e.clientX+'px';drag.ghost.style.top=e.clientY+'px';
+  const over=document.elementFromPoint(e.clientX,e.clientY)?.closest('.slot');
+  if(drag.over&&drag.over!==over)drag.over.classList.remove('drop');
+  if(over)over.classList.add('drop');drag.over=over;
+});
+document.addEventListener('pointerup',e=>{
+  if(!drag)return;const d=drag;drag=null;
+  const snd=style.sounds.find(s=>s.id===d.id);
+  if(d.ghost){d.ghost.remove();if(d.over){d.over.classList.remove('drop');addSound(snd,[...$('slots').children].indexOf(d.over));}}
+  else addSound(snd);
+});
+document.addEventListener('pointercancel',()=>{if(drag){drag.ghost?.remove();drag.over?.classList.remove('drop');drag=null;}});
+$('palette').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.closest('.chip')){e.preventDefault();addSound(style.sounds.find(s=>s.id===e.target.closest('.chip').dataset.id));}});
+
+/* ---------- Esdeveniments ---------- */
+$('slots').addEventListener('click',e=>{
+  const sl=e.target.closest('.slot');if(!sl)return;const i=[...$('slots').children].indexOf(sl);
+  if(dictat.active&&mystery){if(slots[i].sound&&!slots[i].revealed){slots[i].revealed=true;renderSlot(i);toast(`Era: ${slots[i].sound.name} (${LAYERS[slots[i].sound.layer].name})`);}return;}
+  const b=e.target.closest('[data-a]');if(b){slotAction(i,b.dataset.a);return;}
+  if(e.target.closest('.figbtn'))slotAction(i,'m');
+});
+$('styles').addEventListener('click',e=>{const b=e.target.closest('.stab');if(!b||b.disabled)return;if(b.dataset.k!==style.key_){setStyle(b.dataset.k);if(started)ensureAudio();}});
+$('play').addEventListener('click',async()=>{
+  if(!started){await ensureAudio();return;}
+  if(Tone.Transport.state==='started'){Tone.Transport.pause();}else{Tone.Transport.start();}
+  renderPlay();
+});
+$('startBtn').addEventListener('click',()=>ensureAudio());
+$('tempo').addEventListener('input',e=>{const v=+e.target.value;Tone.Transport.bpm.value=v;
+  const d=v-style.bpm;$('tempoOut').textContent=v+' BPM';
+  $('mInfo').textContent=`${v} BPM · 4/4 · ${style.key}`+(d>=15?' · més energia':d<=-15?' · més tranquil':'');tour.check();});
+document.addEventListener('keydown',e=>{
+  if(e.target.closest('input,textarea,select')||e.metaKey||e.ctrlKey||e.altKey)return;
+  if(e.key===' '&&!e.target.closest('button')){e.preventDefault();$('play').click();}
+  else if(/^[1-7]$/.test(e.key)){slotAction(+e.key-1,'m');}
+});
+function setMode(m){
+  if(mode===m)return;mode=m;
+  if(m==='crea'){if(listen.playing)stopListen();if(hiddenStyle){hiddenStyle=false;mystery=false;quiz.picked=quiz.answer;renderSlots();renderStyles();renderMeta();}}
+  if(m!=='prof'){if(dictat.active)endDictat();if(prof.proj)setProj(false);}
+  if(m==='prof'){if(listen.playing)stopListen();if(hiddenStyle){hiddenStyle=false;mystery=false;quiz.picked=quiz.answer;renderSlots();renderStyles();renderMeta();}}
+  $('modeCrea').setAttribute('aria-pressed',m==='crea');$('modeRep').setAttribute('aria-pressed',m==='rep');$('modeProf').setAttribute('aria-pressed',m==='prof');
+  afterChange();
+}
+$('modeCrea').addEventListener('click',()=>setMode('crea'));
+$('modeRep').addEventListener('click',()=>setMode('rep'));
+$('modeProf').addEventListener('click',()=>setMode('prof'));
+$('side').addEventListener('click',e=>{
+  const t=e.target.closest('button');if(!t)return;
+  if(t.dataset.close){const p=inspect;inspect=null;if(p!=null)renderSlot(p);renderSide();return;}
+  if(t.dataset.sub){if(listen.playing)stopListen();if(hiddenStyle&&t.dataset.sub!=='est'){hiddenStyle=false;mystery=false;quiz.picked=quiz.answer;renderSlots();renderStyles();renderMeta();}sub=t.dataset.sub;renderSide();renderPalette();return;}
+  if(t.dataset.lvl){listen.level=+t.dataset.lvl;listen.target=null;listen.fb=null;listen.showHint=false;renderSide();return;}
+  if(t.dataset.q){answerQuiz(t.dataset.q);return;}
+  if(t.dataset.dlv){dictat.level=+t.dataset.dlv;renderSide();return;}
+  if(t.dataset.tmin){startTimer(+t.dataset.tmin);return;}
+  switch(t.id){
+    case 'lisBtn':startListen();break;
+    case 'backBtn':stopListen();break;
+    case 'newT':if(listen.playing)stopListen();newTarget();listen.showHint=false;startListen();break;
+    case 'chkBtn':checkListen();break;
+    case 'hintBtn':listen.showHint=true;renderSide();break;
+    case 'quizBtn':newQuiz();break;
+    case 'projOn':setProj(true);break;
+    case 'dNew':startDictat();break;
+    case 'dAll':slots.forEach((x,i)=>{if(x.sound){x.revealed=true;renderSlot(i);}});break;
+    case 'dEnd':endDictat();break;
+    case 'shareBtn':openShare();break;
+    case 'spin':spin();break;
+    case 'tStop':stopTimer();break;
+  }
+});
+$('clearBtn').addEventListener('click',()=>{if(mystery)return;clearAll();afterChange();});
+$('codeBtn').addEventListener('click',()=>{$('codeBox').hidden=!$('codeBox').hidden;updateCode();});
+$('copyBtn').addEventListener('click',()=>{const txt=codeOf();navigator.clipboard?.writeText(txt).then(()=>toast('Codi copiat'),()=>{const r=document.createRange();r.selectNodeContents($('codeOut'));const s=getSelection();s.removeAllRanges();s.addRange(r);toast('Selecciona i copia el codi');});});
+$('loadBtn').addEventListener('click',()=>loadCode($('codeIn').value));
+$('codeIn').addEventListener('keydown',e=>{if(e.key==='Enter')loadCode($('codeIn').value);});
+
+/* ---------- Gravació ---------- */
+let recBlob=null,recT0=0,recTimer=null,downloads=null;
+(async()=>{try{downloads=window.claude?.use?await window.claude.use('downloads'):null;}catch(e){downloads=null;}})();
+$('recBtn').addEventListener('click',async()=>{
+  if(recorder.state==='started'){
+    clearInterval(recTimer);
+    recBlob=await recorder.stop();
+    $('recBtn').classList.remove('on');$('recLbl').textContent='Grava';$('recTime').hidden=true;
+    try{$('recAudio').src=URL.createObjectURL(recBlob);}catch(e){}
+    $('recOut').hidden=false;
+    $('saveHint').textContent='';$('saveBtn').hidden=false;
+    return;
+  }
+  await ensureAudio();
+  recorder.start();recT0=Date.now();
+  $('recBtn').classList.add('on');$('recLbl').textContent='Atura';$('recTime').hidden=false;$('recTime').textContent='0:00';
+  recTimer=setInterval(()=>{const s=Math.floor((Date.now()-recT0)/1000);$('recTime').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');},250);
+});
+$('saveBtn').addEventListener('click',async()=>{
+  if(!recBlob)return;
+  const ext=/mp4/.test(recBlob.type)?'mp4':'webm';const fname=`beatcolla-${style.name.toLowerCase().replace(/[^a-z]/g,'')}.${ext}`;
+  if(!downloads){const a=document.createElement('a');a.href=URL.createObjectURL(recBlob);a.download=fname;document.body.appendChild(a);a.click();a.remove();toast('Àudio desat');return;}
+  try{await downloads.save({filename:fname,data:recBlob});toast('Àudio desat');}
+  catch(err){if(err&&err.code==='declined')return;toast('No s\'ha pogut desar l\'àudio en aquesta vista.');}
+});
+
+/* ---------- Animació ---------- */
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function frame(){
+  for(const sl of slots){
+    if(!sl.el||!sl.sound)continue;
+    let v=sl.meter.getValue();if(Array.isArray(v))v=v[0];
+    const l=Math.min(1,(v||0)*3.2);
+    if(!reduce)sl.el.style.setProperty('--lv',l.toFixed(3));
+    if(sl.mouth)sl.mouth.setAttribute('ry',(sl.muted?1:2+l*13).toFixed(1));
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ---------- Mode professor ---------- */
+const PUBLIC_URL='https://jmateog13-creator.github.io/beatcolla/';
+const prof={proj:false,students:25,turn:null,timerEnd:0,timerId:null};
+const dictat={active:false,saved:null,level:3};
+function profPanel(){
+  const left=prof.timerEnd?Math.max(0,prof.timerEnd-Date.now()):0;
+  return `<div class="card"><span class="eyebrow">Mode professor</span><h3>Vista de projector</h3>
+    <p class="muted">Amaga els panells i mostra en gran la textura, l'acord, el temps del compàs, el temporitzador i els torns.</p>
+    <div class="row"><button class="btn primary" id="projOn">Activa la vista de projector</button></div></div>
+  <div class="card"><h3>Dictat de capes</h3>
+    <p class="muted">Sona una mescla misteriosa. La classe diu quines capes i quins sons hi ha. Toca cada personatge per revelar-lo.</p>
+    <div class="row"><span class="eyebrow">Sons</span><div class="seg" role="group" aria-label="Nombre de sons">${[2,3,4,5].map(n=>`<button data-dlv="${n}" aria-pressed="${dictat.level===n}">${n}</button>`).join('')}</div></div>
+    <div class="row"><button class="btn primary" id="dNew">${dictat.active?'Una altra mescla':'Nova mescla misteriosa'}</button>${dictat.active?'<button class="btn" id="dAll">Revela-ho tot</button><button class="btn" id="dEnd">Torna a la meva mescla</button>':''}</div></div>
+  <div class="card"><h3>Comparteix la base</h3>
+    <p class="muted">Construeix una base i mostra un QR. Els alumnes l'obren al seu dispositiu i hi afegeixen capes.</p>
+    <div class="row"><button class="btn primary" id="shareBtn">Mostra el QR a la classe</button><code style="font-family:var(--f-mono)">${codeOf()}</code></div></div>
+  <div class="card"><h3>Ruleta de torns</h3>
+    <p class="muted">Tria a l'atzar qui surt a la pissarra i quina capa ha d'afegir.</p>
+    <div class="row"><label for="nStud" class="muted">Alumnes</label><input class="numin" id="nStud" type="number" min="2" max="40" value="${prof.students}"><button class="btn primary" id="spin">Gira</button></div>
+    <div class="ruleta" id="turnOut" aria-live="polite">${prof.turn||'–'}</div></div>
+  <div class="card"><h3>Temporitzador</h3>
+    <div class="row">${[2,5,10].map(m=>`<button class="btn" data-tmin="${m}">${m} min</button>`).join('')}<button class="btn" id="tStop" ${prof.timerEnd?'':'disabled'}>Atura</button></div>
+    <div class="timerbig" id="tOut">${prof.timerEnd?fmt(left):'0:00'}</div></div>`;
+}
+const fmt=ms=>{const s=Math.ceil(ms/1000);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
+function setProj(on){
+  prof.proj=on;app.classList.toggle('proj',on);$('projBar').hidden=!on;$('projExit').hidden=!on;
+  if(on){renderSide();try{document.documentElement.requestFullscreen?.().catch(()=>{});}catch(e){}window.scrollTo(0,0);}
+  else{try{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});}catch(e){}}
+}
+$('projExit').addEventListener('click',()=>setProj(false));
+function startDictat(){
+  if(!dictat.active)dictat.saved=slots.map(s=>s.sound?{snd:s.sound,m:s.muted,so:s.solo}:null);
+  dictat.active=true;mystery=true;clearAll();
+  pickMix(style,dictat.level).forEach((s,i)=>assign(i,s));
+  ensureAudio();afterChange();
+}
+function endDictat(){
+  if(!dictat.active)return;dictat.active=false;mystery=false;clearAll();
+  (dictat.saved||[]).forEach((x,i)=>{if(x){assign(i,x.snd);const sl=slots[i];sl.muted=x.m;sl.ch.mute=x.m;sl.solo=x.so;sl.ch.solo=x.so;renderSlot(i);}});
+  afterChange();
+}
+function spin(){
+  const inp=$('nStud');prof.students=Math.max(2,Math.min(40,+inp.value||25));
+  const f=fillC();const min=Math.min(...LKEYS.map(l=>f[l]));const cand=LKEYS.filter(l=>f[l]===min);
+  const layer=cand[Math.floor(Math.random()*cand.length)];const n=1+Math.floor(Math.random()*prof.students);
+  const out=$('turnOut');let k=0;
+  const final=`Alumne/a ${n} → afegeix ${LAYERS[layer].name}`;
+  const roll=setInterval(()=>{k++;const r=1+Math.floor(Math.random()*prof.students);if(out)out.textContent='Alumne/a '+r+'…';$('pjTurn').textContent='Alumne/a '+r+'…';
+    if(k>=(reduce?1:14)){clearInterval(roll);prof.turn=final;if($('turnOut'))$('turnOut').textContent=final;$('pjTurn').textContent=final;}},70);
+}
+let bell=null;
+function ring(){try{if(!bell){bell=new Tone.PolySynth(Tone.FMSynth,{harmonicity:3.01,modulationIndex:8,envelope:{attack:.001,decay:1.8,sustain:0,release:1.5}}).connect(master);bell.volume.value=-8;}
+  const t=Tone.now();[0,.25,.5].forEach((d,i)=>bell.triggerAttackRelease(mtof(pentM(style.mel,5+i*2)),1.2,t+d));}catch(e){}}
+function startTimer(min){
+  prof.timerEnd=Date.now()+min*60000;clearInterval(prof.timerId);
+  prof.timerId=setInterval(()=>{const left=prof.timerEnd-Date.now();const txt=fmt(Math.max(0,left));
+    if($('tOut'))$('tOut').textContent=txt;$('pjTimer').textContent=txt;
+    if(left<=0){stopTimer();ring();toast('S\'ha acabat el temps!');}},250);
+  renderSide();
+}
+function stopTimer(){clearInterval(prof.timerId);prof.timerEnd=0;$('pjTimer').textContent='–';if(mode==='prof')renderSide();}
+let qrObj=null;
+function shareLink(){return PUBLIC_URL+'#'+codeOf();}
+function openShare(){
+  const url=shareLink();$('shareCode').textContent=codeOf();$('shareUrl').textContent=url;
+  const box=$('qr');box.innerHTML='';
+  try{qrObj=new QRCode(box,{text:url,width:512,height:512,colorDark:'#120F27',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});}catch(e){box.textContent='No s\'ha pogut generar el QR.';}
+  $('shareOv').hidden=false;
+}
+$('shareClose').addEventListener('click',()=>$('shareOv').hidden=true);
+$('shareOv').addEventListener('click',e=>{if(e.target.id==='shareOv')$('shareOv').hidden=true;});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('shareOv').hidden)$('shareOv').hidden=true;else if(prof.proj)setProj(false);}});
+$('shareCopy').addEventListener('click',()=>{const u=shareLink();navigator.clipboard?.writeText(u).then(()=>toast('Enllaç copiat'),()=>toast('Selecciona l\'enllaç i copia\'l'));});
+
+/* ---------- Tutorial ---------- */
+const fillC=()=>{const c={ritme:0,baix:0,harmonia:0,melodia:0,efectes:0};slots.forEach(s=>{if(s.sound)c[s.sound.layer]++;});return c;};
+let tourStyle0=null;
+const TOUR=[
+ {t:'Benvingut/da a BeatColla!',d:'Crearàs música per capes, com si dirigissis una colla de músics. Et guiaré pas a pas. Comencem amb l\'escenari buit.',btn:'Comencem'},
+ {el:'#slots',t:'Els músics',d:'Cada personatge és un músic. Hi caben 7. Ara tots els llocs són buits.'},
+ {el:'#palette',t:'La paleta de sons',d:'Just a sota tens els sons, ordenats per capes. Cada color és una capa diferent de la música.'},
+ {el:'#palette .prow:nth-child(1)',t:'Posa un ritme',todo:'Arrossega un so vermell (Ritme) fins a un personatge, o simplement toca\'l.',ok:()=>fillC().ritme>=1},
+ {el:'#palette .prow:nth-child(2)',t:'Afegeix el baix',d:'El baix toca notes greus i sosté els acords.',todo:'Posa un so lila (Baix).',ok:()=>fillC().baix>=1},
+ {el:'#palette .prow:nth-child(4)',t:'Ara, la melodia',d:'La melodia és la part que es pot cantar o xiular.',todo:'Posa un so groc (Melodia).',ok:()=>fillC().melodia>=1},
+ {el:'#side .card',t:'Què sona ara?',d:'Aquest panell t\'explica la textura. Amb una melodia i acompanyament de ritme i baix tens una «melodia acompanyada».'},
+ {el:'#palette .prow:nth-child(3)',t:'Afegeix acords',d:'L\'harmonia són diverses notes que sonen alhora: els acords.',todo:'Posa un so blau (Harmonia).',ok:()=>fillC().harmonia>=1},
+ {el:'#slots',t:'Silencia un músic',d:'Així sents com canvia la música quan falta una capa.',todo:'Toca un personatge o prem el seu botó M.',ok:()=>slots.some(s=>s.sound&&s.muted)},
+ {el:'#slots',t:'Escolta\'n només un',d:'El botó S (solo) fa callar tots els altres. Torna\'l a prémer per sentir-los de nou.',todo:'Prem S en un personatge.',ok:()=>slots.some(s=>s.sound&&s.solo)},
+ {el:'#slots',t:'Mira què toca',d:'Veuràs el seu ritme en caselles. Cada casella és una semicorxera.',todo:'Prem el botó i d\'un personatge.',ok:()=>inspect!=null},
+ {el:'#prog',t:'Els acords i el compàs',d:'Els acords canvien a cada compàs. Els punts que s\'encenen són els 4 temps del compàs.'},
+ {el:'#tempoBox',t:'Canvia el tempo',d:'Més BPM vol dir més ràpid i amb més energia. Menys BPM, més tranquil.',todo:'Mou el control de tempo.',ok:()=>Math.abs(Tone.Transport.bpm.value-style.bpm)>=5},
+ {el:'#styles',t:'Canvia d\'estil',d:'Cada estil té els seus sons, el seu tempo i els seus acords.',todo:'Tria un altre estil.',enter:()=>{tourStyle0=style.key_;},ok:()=>style.key_!==tourStyle0},
+ {el:'.actions',t:'Grava i entrega',d:'Amb «Grava» enregistres la teva mescla. Amb «Codi de la mescla» obtens un codi curt per entregar-la al professor.'},
+ {el:'#modeRep',t:'Els reptes',d:'Hi trobaràs reptes de textura, d\'escolta i d\'estils per guanyar estrelles.',todo:'Prem «Reptes».',ok:()=>mode==='rep'},
+ {t:'Ja ets de la colla!',d:'Ja saps fer servir BeatColla. Ara, a crear i a superar reptes!',btn:'Acaba',last:true}
+];
+const tour={i:-1,spot:null,card:null,timer:null,passing:false,
+  start(){
+    if(listen.playing)stopListen();
+    if(mode!=='crea')setMode('crea');
+    if(hiddenStyle){hiddenStyle=false;mystery=false;renderStyles();renderMeta();}
+    clearAll();inspect=null;afterChange();ensureAudio();
+    if(!this.spot){this.spot=document.createElement('div');this.spot.className='tour-spot';this.card=document.createElement('div');this.card.className='tour-card';this.card.setAttribute('role','dialog');this.card.setAttribute('aria-live','polite');document.body.append(this.spot,this.card);
+      this.card.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.t==='next')this.next();else if(b.dataset.t==='skip')this.end(false);});}
+    this.spot.hidden=false;this.card.hidden=false;this.i=0;this.show();
+    clearInterval(this.timer);this.timer=setInterval(()=>this.place(),250);
+  },
+  show(){
+    const st=TOUR[this.i];this.passing=false;if(st.enter)st.enter();
+    if(st.el==='#side .card'&&mode!=='crea')setMode('crea');
+    const dots=TOUR.map((_,k)=>`<i class="${k<=this.i?'on':''}"></i>`).join('');
+    this.card.innerHTML=`<div class="row" style="justify-content:space-between"><span class="eyebrow">Tutorial · ${this.i+1} de ${TOUR.length}</span><div class="tour-dots">${dots}</div></div>
+      <h3>${st.t}</h3>${st.d?`<p>${st.d}</p>`:''}${st.todo?`<p class="todo" id="tourTodo">→ ${st.todo}</p>`:''}
+      <div class="row" style="justify-content:flex-end">${st.last?'':'<button class="btn" data-t="skip">Surt del tutorial</button>'}${st.ok?'':`<button class="btn primary" data-t="next">${st.btn||'Següent'}</button>`}</div>`;
+    const el=st.el&&document.querySelector(st.el);
+    if(el){const r=el.getBoundingClientRect();if(r.top<70||r.bottom>innerHeight-70)el.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'});}
+    this.place();this.check();
+  },
+  place(){
+    if(this.i<0)return;const st=TOUR[this.i];const el=st.el&&document.querySelector(st.el);
+    if(!el){this.spot.classList.add('none');this.spot.style.left='50%';this.spot.style.top='50%';this.card.className='tour-card bottom';this.card.style.top='';this.card.style.bottom='';return;}
+    const r=el.getBoundingClientRect(),p=6;this.spot.classList.remove('none');
+    Object.assign(this.spot.style,{left:(r.left-p)+'px',top:(r.top-p)+'px',width:(r.width+p*2)+'px',height:(r.height+p*2)+'px'});
+    this.card.className='tour-card '+((r.top+r.height/2)>innerHeight/2?'top':'bottom');
+  },
+  check(){
+    if(this.i<0||this.passing)return;const st=TOUR[this.i];
+    if(st&&st.ok&&st.ok()){this.passing=true;const td=document.getElementById('tourTodo');if(td){td.className='done';td.textContent='✓ Molt bé!';}setTimeout(()=>this.next(),reduce?300:950);}
+  },
+  next(){if(this.i<0)return;if(TOUR[this.i].last){this.end(true);return;}this.i++;this.show();},
+  end(done){
+    this.i=-1;clearInterval(this.timer);this.spot.hidden=true;this.card.hidden=true;
+    if(done){let first=true;try{first=!localStorage.getItem('beatcolla.tour');localStorage.setItem('beatcolla.tour','1');}catch(e){}if(first)addStars(3);}
+  }
+};
+$('tourBtn').addEventListener('click',()=>tour.start());
+
+/* ---------- Landing ---------- */
+function enterApp(how,styleKey){
+  $('landing').hidden=true;app.hidden=false;window.scrollTo(0,0);
+  if(styleKey&&styleKey!==style.key_)setStyle(styleKey);
+  if(how==='tour')tour.start();else ensureAudio();
+}
+function showLanding(){
+  if(tour.i>=0)tour.end(false);
+  if(listen.playing)stopListen();
+  Tone.Transport.pause();renderPlay();
+  app.hidden=true;$('landing').hidden=false;window.scrollTo(0,0);
+}
+$('homeBtn').addEventListener('click',showLanding);
+$('landing').addEventListener('click',e=>{const b=e.target.closest('[data-enter],[data-style-go]');if(!b)return;enterApp(b.dataset.enter||'app',b.dataset.styleGo);});
+$('lChars').innerHTML=LKEYS.map(l=>`<div class="lchar" style="--c:var(--${l})">${charSVG(l,false)}<span>${LAYERS[l].name}</span></div>`).join('');
+$('lStyles').innerHTML=Object.entries(STYLES).map(([k,st])=>`<button class="lst" data-style-go="${k}" style="--sc:${st.accent}" aria-label="Obre ${st.name}"><span class="n">${st.name}</span><span class="b">${st.bpm} BPM · ${st.key}</span><span class="o">${st.origin}</span><span class="f">${st.features[0]}</span></button>`).join('');
+(()=>{const hh=STYLES.hh.sounds;
+  const merge=(...ps)=>[...Array(16)].map((_,k)=>ps.some(p=>p[k]==='x')?'x':ps.some(p=>p[k]==='o')?'x':'.').join('');
+  const lane=s=>{const p=P(s).slice(0,16);return [...p].map(c=>`<i class="${c==='-'?'h':c!=='.'?'on':''}"></i>`).join('');};
+  const rows=[['ritme',merge(...hh[0].tracks.map(([,p])=>p))],['baix',hh[4].p],['harmonia',hh[8].p],['melodia',hh[12].p],['efectes',hh[16].p.replace(/\s/g,'').slice(16)]];
+  $('lMixer').innerHTML=rows.map(([l,p])=>`<div class="mrow" style="--c:var(--${l})"><span style="color:var(--${l})">${LAYERS[l].name}</span><div class="lane">${lane(p)}</div></div>`).join('')+'<p class="cap">Un compàs de hip-hop a BeatColla: cada fila és una capa i cada casella, una semicorxera.</p>';
+})();
+function handleHash(){const h=decodeURIComponent(location.hash.slice(1));
+ if(h==='app'){$('landing').hidden=true;app.hidden=false;}
+ else if(/^(HH|RG|TC|TR|RC)-[0-9A-J_]{7}$/i.test(h)){$('landing').hidden=true;app.hidden=false;if(tour.i>=0)tour.end(false);setMode('crea');loadCode(h,!started);}}
+
+$('startTour').addEventListener('click',e=>{e.stopPropagation();tour.start();});
+
+/* ---------- Inici ---------- */
+initAudio();
+$('slots').innerHTML='<div class="slot"></div>'.repeat(7);
+setStyle('hh');
+[0,4,12].forEach(i=>assign([0,4,12].indexOf(i),STYLES.hh.sounds[i]));
+$('starN').textContent=stars;
+renderPlay();afterChange();
+requestAnimationFrame(frame);
+handleHash();window.addEventListener('hashchange',handleHash);
+})();
+</script>

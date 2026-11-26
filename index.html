@@ -387,11 +387,93 @@ header.top{display:flex; flex-wrap:wrap; align-items:center; gap:12px 18px}
 .bigcode{font-family:var(--f-mono); font-size:clamp(26px,5vw,48px); letter-spacing:.08em; background:var(--surface-2); border-radius:12px; padding:6px 14px; display:inline-block; user-select:all}
 .urlline{font-family:var(--f-mono); font-size:13px; color:var(--muted); overflow-wrap:anywhere}
 @media (max-width:720px){ #projBar{grid-template-columns:repeat(2,minmax(0,1fr))} #projBar .pj:first-child{grid-column:1 / -1} .sharebox{grid-template-columns:minmax(0,1fr); justify-items:center; text-align:center} }
+
+/* ================= v5: interfície i personatges ================= */
+:root{--secA:#F0703A; --secB:#12A39B; --secC:#C2479B}
+body{background:radial-gradient(1100px 520px at 0% -8%, color-mix(in srgb, var(--style) 9%, transparent), transparent 70%), var(--bg)}
+.ic{width:17px; height:17px; flex:none; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+.ic.fillc{fill:currentColor; stroke:none}
+/* Barra superior */
+header.top{background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:8px 10px 8px 14px; box-shadow:0 1px 0 rgba(0,0,0,.03)}
+.logo .mark{width:30px; height:30px; margin-right:8px; align-self:center; flex:none}
+.logo .mark rect{fill:var(--style)}
+.logo .mark rect:nth-child(2){fill:var(--baix)} .logo .mark rect:nth-child(3){fill:var(--melodia)} .logo .mark rect:nth-child(4){fill:var(--efectes)}
+.btn{transition:background .12s, transform .12s}
+.btn:hover:not(:disabled){background:var(--surface-2)}
+.btn.primary:hover:not(:disabled){background:var(--ink); filter:brightness(1.15)}
+.btn.icon-only{padding:8px 9px}
+.stars{gap:6px}
+.stars svg{width:16px; height:16px; fill:var(--melodia)}
+/* Escenari de concert */
+.stage{padding:22px 16px 0}
+.truss{position:absolute; left:0; right:0; top:0; height:12px; z-index:0; background:repeating-linear-gradient(45deg, rgba(255,255,255,.10) 0 2px, transparent 2px 9px), linear-gradient(#3A3462,#1B1736); border-bottom:1px solid rgba(255,255,255,.08)}
+.led{position:absolute; inset:12px 0 78px 0; pointer-events:none; background-image:radial-gradient(circle, color-mix(in srgb, var(--style) 55%, transparent) 1.1px, transparent 1.7px); background-size:13px 13px; opacity:.22; -webkit-mask-image:linear-gradient(180deg, transparent 0%, #000 35%, #000 70%, transparent 100%); mask-image:linear-gradient(180deg, transparent 0%, #000 35%, #000 70%, transparent 100%)}
+.floor{height:84px; background:linear-gradient(180deg, #332B6B 0%, #1A1640 55%, #120F2B 100%); border-top:2px solid color-mix(in srgb, var(--style) 60%, #7B6FD6)}
+.floor::after{content:""; position:absolute; left:8%; right:8%; top:6px; height:22px; border-radius:50%; background:radial-gradient(closest-side, rgba(255,255,255,.10), transparent)}
+.lamp{position:absolute; top:-40px; left:50%; width:22px; height:11px; margin-left:-11px; border-radius:3px 3px 9px 9px; background:#14112A; border:1px solid rgba(255,255,255,.15); z-index:0; pointer-events:none; box-shadow:0 4px calc(4px + var(--lv,0) * 18px) color-mix(in srgb, var(--c) calc(30% + var(--lv,0) * 70%), transparent)}
+.slot.muted .lamp{box-shadow:none}
+.beam{top:-30px}
+.figbtn{max-width:132px}
+.ph{max-width:128px; aspect-ratio:140/220; border-radius:60px 60px 26px 26px; border-width:2px; font-size:28px; background:radial-gradient(70% 30% at 50% 96%, rgba(255,255,255,.08), transparent), rgba(255,255,255,.02)}
+.slot-name{font-size:13.5px}
+.slot-ctl button{background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.14); color:var(--ink)}
+.slot-ctl button:hover{background:rgba(255,255,255,.14)}
+.slot-ctl button[aria-pressed="true"]{background:var(--c); border-color:var(--c); color:#fff}
+/* Personatges vectorials */
+.char .eyes{transform-box:fill-box; transform-origin:center; animation:blink 5.2s infinite}
+.slot:nth-child(2n) .eyes{animation-delay:1.7s} .slot:nth-child(3n) .eyes{animation-delay:3.1s}
+.slot.muted .eyes{animation:none; transform:scaleY(.12)}
+.char .shadow{fill:#000; opacity:.35}
+.char .glow{fill:var(--c); opacity:calc(.12 + var(--lv,0) * .45)}
+.char .arm-l,.char .arm-r{transform-box:fill-box; transform-origin:50% 8%}
+.char .arm-l{transform:rotate(calc(var(--lv,0) * 26deg))}
+.char .arm-r{transform:rotate(calc(var(--lv,0) * -26deg))}
+.char.calm .arm-l{transform:rotate(calc(var(--lv,0) * 6deg))}
+.char.calm .arm-r{transform:rotate(calc(var(--lv,0) * -6deg))}
+.char .head{transform-box:fill-box; transform-origin:50% 100%; transform:rotate(calc(var(--lv,0) * 5deg))}
+.slot:nth-child(2n) .char .head{transform:rotate(calc(var(--lv,0) * -5deg))}
+.char .glyph{font-family:var(--f-display); font-weight:800; font-size:17px; text-anchor:middle}
+.char .q{fill:#fff; font-family:var(--f-display); font-weight:800; font-size:38px; text-anchor:middle}
+.slot.muted .char{filter:grayscale(1) brightness(.75); opacity:.5}
+/* Paleta */
+.chip .g{width:24px; height:24px; border-radius:7px}
+.chip .g .ic{width:15px; height:15px; stroke:#fff}
+.phead b .ic{width:16px; height:16px}
+/* Textura visual */
+.tviz{width:100%; height:auto; display:block; border-radius:10px; background:var(--surface-2)}
+.tviz .off{stroke:var(--line)}
+/* Forma musical */
+.formbox{background:var(--surface); border:1px solid var(--line); border-radius:20px; padding:14px; display:flex; flex-direction:column; gap:12px}
+.fhead{display:flex; flex-wrap:wrap; gap:10px 16px; align-items:flex-end; justify-content:space-between}
+.fhead h3{font-family:var(--f-display); font-weight:800; font-size:22px; margin:2px 0 0; line-height:1.05}
+.fhead p{margin:4px 0 0; color:var(--muted); font-size:14px; max-width:52ch}
+.fsecs{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px}
+.fsec{border:2px solid var(--sc); border-radius:16px; padding:10px; display:grid; grid-template-columns:auto minmax(0,1fr); gap:4px 10px; align-items:center; background:linear-gradient(180deg, color-mix(in srgb, var(--sc) 10%, var(--surface)), var(--surface))}
+.fsec.unused{opacity:.4; border-style:dashed}
+.fsec .fl{grid-row:1 / span 2; width:46px; height:46px; border-radius:12px; background:var(--sc); color:#fff; display:grid; place-items:center; font-family:var(--f-display); font-weight:800; font-size:28px}
+.fsec .fdots{display:flex; flex-wrap:wrap; gap:3px; align-items:center; min-height:14px; font-size:12.5px; color:var(--muted)}
+.fsec .fdots i{width:11px; height:11px; border-radius:50%; background:var(--c)}
+.fsec .row{gap:5px}
+.fsec .btn{padding:5px 9px; font-size:13px}
+.fsec.editing{box-shadow:0 0 0 3px color-mix(in srgb, var(--sc) 35%, transparent)}
+.timeline{display:flex; gap:6px; align-items:stretch}
+.tblk{flex:1; position:relative; height:54px; border-radius:12px; background:var(--sc); color:#fff; display:grid; place-items:center; font-family:var(--f-display); font-weight:800; font-size:26px; overflow:hidden; transition:transform .15s}
+.tblk.empty{background:repeating-linear-gradient(45deg, var(--surface-2) 0 8px, var(--surface) 8px 16px); color:var(--muted); border:2px dashed var(--line)}
+.tblk.on{transform:translateY(-3px); box-shadow:0 6px 0 color-mix(in srgb, var(--sc) 45%, #000)}
+.tblk i{position:absolute; left:0; bottom:0; height:5px; width:calc(var(--p,0) * 100%); background:rgba(255,255,255,.85)}
+.tblk small{position:absolute; top:5px; left:8px; font-family:var(--f-mono); font-weight:500; font-size:10px; opacity:.85}
+.fctl{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+.fctl code{font-family:var(--f-mono); font-size:13px; background:var(--surface-2); padding:4px 8px; border-radius:7px; overflow-wrap:anywhere}
+.slots{margin-top:30px}
+.lamp{top:-26px} .beam{top:-20px}
+.bar .c{white-space:nowrap}
+@media (max-width:720px){ .fsecs{grid-template-columns:minmax(0,1fr)} .tblk{height:44px; font-size:20px} .lamp{display:none} .slots{margin-top:16px} .beam{top:-8px} .bar .c{font-size:14px} }
+@media (prefers-reduced-motion: reduce){ .char .head,.char .arm-l,.char .arm-r{transform:none} .tblk{transition:none} }
 </style>
 
 <div class="landing" id="landing" data-style="hh">
   <nav class="lnav">
-    <div class="logo">Beat<b>Colla</b></div>
+    <div class="logo"><svg class="mark" viewBox="0 0 30 30" aria-hidden="true"><rect x="2" y="12" width="5" height="16" rx="2.5"/><rect x="9" y="4" width="5" height="24" rx="2.5"/><rect x="16" y="9" width="5" height="19" rx="2.5"/><rect x="23" y="15" width="5" height="13" rx="2.5"/></svg>Beat<b>Colla</b></div>
     <button class="btn primary" data-enter="app">Obre l'app</button>
   </nav>
 
@@ -434,6 +516,7 @@ header.top{display:flex; flex-wrap:wrap; align-items:center; gap:12px 18px}
         <li style="--c:var(--baix)"><span class="sw"></span><div><b>Baix i acords</b><span>Fonamental, tercera i quinta. Progressions com La m – Fa – Do – Sol.</span></div></li>
         <li style="--c:var(--harmonia)"><span class="sw"></span><div><b>Textura</b><span>Monodia, melodia acompanyada i polifonia, detectades en directe.</span></div></li>
         <li style="--c:var(--melodia)"><span class="sw"></span><div><b>Melodia</b><span>L'escala pentatònica, i per què sempre sona bé.</span></div></li>
+        <li style="--c:var(--secB)"><span class="sw"></span><div><b>Forma musical</b><span>Seccions A, B i C per construir formes A-B-A, A-B-C i A-A-A.</span></div></li>
         <li style="--c:var(--efectes)"><span class="sw"></span><div><b>Tempo i estil</b><span>BPM, caràcter i context històric de cada gènere.</span></div></li>
       </ul>
     </div>
@@ -459,7 +542,7 @@ header.top{display:flex; flex-wrap:wrap; align-items:center; gap:12px 18px}
       <li><b>Entregues amb un codi</b><span>Cada mescla té un codi curt, com <code>HH-04C____</code>, que la reprodueix exactament.</span></li>
       <li><b>Gravació d'àudio</b><span>L'alumne grava la seva creació i la desa com a fitxer.</span></li>
       <li><b>Chromebook i mòbil</b><span>Es fa servir amb ratolí o amb el dit, i també a la pissarra digital.</span></li>
-      <li><b>Tutorial guiat</b><span>17 passos interactius que esperen que l'alumne faci cada acció.</span></li>
+      <li><b>Tutorial guiat</b><span>18 passos interactius que esperen que l'alumne faci cada acció.</span></li>
       <li><b>Vista de projector</b><span>Textura, acord i temps del compàs en gran per a la pissarra digital.</span></li>
       <li><b>Dictat de capes</b><span>Una mescla misteriosa que la classe ha d'endevinar. Revela els sons d'un en un.</span></li>
       <li><b>QR per a la classe</b><span>Comparteix la teva base: cada alumne l'obre al mòbil i hi afegeix capes.</span></li>
@@ -479,7 +562,7 @@ header.top{display:flex; flex-wrap:wrap; align-items:center; gap:12px 18px}
 
 <div class="wrap" id="app" data-style="hh" hidden>
   <header class="top">
-    <div class="logo">Beat<b>Colla</b><small>Crea música per capes · 1r d'ESO</small></div>
+    <div class="logo"><svg class="mark" viewBox="0 0 30 30" aria-hidden="true"><rect x="2" y="12" width="5" height="16" rx="2.5"/><rect x="9" y="4" width="5" height="24" rx="2.5"/><rect x="16" y="9" width="5" height="19" rx="2.5"/><rect x="23" y="15" width="5" height="13" rx="2.5"/></svg>Beat<b>Colla</b><small>Crea música per capes · 1r d'ESO</small></div>
     <div class="seg" role="group" aria-label="Mode">
       <button id="modeCrea" aria-pressed="true">Crea</button>
       <button id="modeRep" aria-pressed="false">Reptes</button>
@@ -487,9 +570,9 @@ header.top{display:flex; flex-wrap:wrap; align-items:center; gap:12px 18px}
     </div>
     <div class="spacer"></div>
     <button class="btn primary" id="projExit" hidden>Surt del projector</button>
-    <button class="btn" id="homeBtn">Inici</button>
-    <button class="btn" id="tourBtn">Tutorial</button>
-    <div class="stars" title="Estrelles guanyades als reptes"><span class="s">★</span><span id="starN">0</span></div>
+    <button class="btn" id="homeBtn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>Inici</button>
+    <button class="btn" id="tourBtn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7"/><path d="M12 17h.01"/></svg>Tutorial</button>
+    <div class="stars" title="Estrelles guanyades als reptes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></svg><span id="starN">0</span></div>
   </header>
 
   <nav class="styles" id="styles" aria-label="Estil musical"></nav>
@@ -497,7 +580,7 @@ header.top{display:flex; flex-wrap:wrap; align-items:center; gap:12px 18px}
   <div class="main">
     <div style="display:flex; flex-direction:column; gap:12px; min-width:0">
       <section class="stage" id="stage" aria-label="Escenari">
-        <div class="lights" aria-hidden="true"></div><div class="flash" id="flash" aria-hidden="true"></div>
+        <div class="truss" aria-hidden="true"></div><div class="led" aria-hidden="true"></div><div class="lights" aria-hidden="true"></div><div class="flash" id="flash" aria-hidden="true"></div>
         <div class="stagebar">
           <button class="play" id="play" aria-label="Reprodueix"></button>
           <div class="meta"><strong id="mStyle">Hip-hop</strong><span id="mInfo">90 BPM · 4/4 · Do menor</span></div>
@@ -521,12 +604,13 @@ header.top{display:flex; flex-wrap:wrap; align-items:center; gap:12px 18px}
         </div>
       </section>
       <section class="palette" id="palette" aria-label="Paleta de sons"></section>
+      <section class="formbox" id="formBox" aria-label="Forma musical"></section>
 
       <div class="actions">
-        <button class="btn rec" id="recBtn"><span class="dot"></span><span id="recLbl">Grava</span></button>
+        <button class="btn rec" id="recBtn"><span class="dot"></span><span id="recLbl">Grava la mescla</span></button>
         <span class="timer" id="recTime" hidden>0:00</span>
-        <button class="btn" id="codeBtn">Codi de la mescla</button>
-        <button class="btn" id="clearBtn">Esborra-ho tot</button>
+        <button class="btn" id="codeBtn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>Codi de la mescla</button>
+        <button class="btn" id="clearBtn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>Esborra-ho tot</button>
       </div>
       <div class="recout" id="recOut" hidden>
         <audio id="recAudio" controls></audio>
@@ -538,7 +622,7 @@ header.top{display:flex; flex-wrap:wrap; align-items:center; gap:12px 18px}
         <button class="btn" id="copyBtn">Copia</button>
         <span class="spacer"></span>
         <label class="muted" for="codeIn">Carrega un codi:</label>
-        <input id="codeIn" maxlength="10" placeholder="HH-0A_F___" autocomplete="off">
+        <input id="codeIn" maxlength="40" placeholder="HH-0A_F___" autocomplete="off" style="width:22ch">
         <button class="btn" id="loadBtn">Carrega</button>
       </div>
     </div>
@@ -867,6 +951,10 @@ function playSlot(sl,s,t,deg){
 
 function tick(time){
   const s=step++;
+  if(arr.playing){const rel=s-arr.s0;
+    if(rel>=0&&rel%arr.len===0){const k=rel/arr.len;
+      if(k>=arr.order.length){arr.playing=false;Tone.Transport.pause(time);Tone.Draw.schedule(()=>endArrangement(true),time);return;}
+      arr.idx=k;applyMix(arr.secs[arr.order[k]],s);Tone.Draw.schedule(()=>{renderSlots();afterChange();},time);}}
   const bar=Math.floor(s/16)%4, deg=style.prog[bar];
   for(const sl of slots){ if(sl.sound&&s>=sl.start){ try{playSlot(sl,s,time,deg)}catch(e){} } }
   Tone.Draw.schedule(()=>drawStep(s),time);
@@ -897,25 +985,117 @@ async function ensureAudio(){
 }
 
 /* ---------- Personatges ---------- */
-function accessory(l){
-  switch(l){
-    case 'ritme':return '<path d="M25 54 Q26 20 60 20 Q94 20 95 54 Z" class="acc"/><path d="M60 50 L108 52 Q108 59 96 59 L60 56 Z" class="acc"/><circle cx="60" cy="22" r="4" class="acc2"/>';
-    case 'baix':return '<path d="M21 66 Q21 16 60 16 Q99 16 99 66" class="accs" stroke-width="7"/><rect x="12" y="54" width="16" height="28" rx="7" class="acc"/><rect x="92" y="54" width="16" height="28" rx="7" class="acc"/>';
-    case 'harmonia':return '<path d="M24 50 Q24 14 60 14 Q96 14 96 50 Z" class="acc"/><rect x="21" y="43" width="78" height="11" rx="5.5" class="acc2"/><circle cx="60" cy="11" r="8" class="acc2"/>';
-    case 'melodia':return '<g class="acc"><circle cx="31" cy="42" r="12"/><circle cx="42" cy="28" r="13"/><circle cx="60" cy="22" r="14"/><circle cx="78" cy="28" r="13"/><circle cx="89" cy="42" r="12"/></g>';
-    case 'efectes':return '<line x1="60" y1="27" x2="60" y2="6" class="accs" stroke-width="4"/><circle cx="60" cy="6" r="6" class="acc2"/><rect x="18" y="56" width="8" height="14" rx="3" class="acc"/><rect x="94" y="56" width="8" height="14" rx="3" class="acc"/>';
-  }return '';
-}
+const LHEX={ritme:'#E5484D',baix:'#7C5CE0',harmonia:'#2D8FD5',melodia:'#E3A008',efectes:'#1FA577'};
+const mixHex=(a,b,t)=>{const p=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));const x=p(a),y=p(b);return '#'+x.map((v,i)=>Math.round(v+(y[i]-v)*t).toString(16).padStart(2,'0')).join('');};
+const lt=(h,t)=>mixHex(h,'#ffffff',t), dk=(h,t)=>mixHex(h,'#000000',t);
+const OUT='#1B1530';
+const ICONS={
+  ritme:'<ellipse cx="12" cy="7.5" rx="8" ry="3"/><path d="M4 7.5v8.5c0 1.7 3.6 3 8 3s8-1.3 8-3V7.5"/><path d="M4 11.5c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',
+  baix:'<path d="M2 12c2.5-7 5-7 7 0s4.5 7 7 0 4.5-7 6 0"/>',
+  harmonia:'<path d="M5 7h14M5 12h14M5 17h14"/><circle cx="9" cy="7" r="1.5"/><circle cx="14" cy="12" r="1.5"/><circle cx="10" cy="17" r="1.5"/>',
+  melodia:'<path d="M9 18V6l10-2v11"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="15" r="2.5"/>',
+  efectes:'<path d="M12 3l2 6.5 6.5 2.5-6.5 2.5L12 21l-2-6.5L3.5 12 10 9.5z"/>'
+};
+const icon=l=>`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[l]}</svg>`;
+const SKIN={ritme:'#7B4A2B',baix:'#C98D5E',harmonia:'#F1C8A0',melodia:'#A5673F',efectes:'#C3CDE2'};
+const HAIR={ritme:'#1D1626',baix:'#3A271B',harmonia:'#7A4522',melodia:'#24160F'};
+let charSeq=0;
 function charSVG(layer,myst){
-  const face=myst?'<text x="60" y="76" class="q">?</text>'
-   :'<ellipse cx="47" cy="58" rx="7" ry="8" class="eye"/><ellipse cx="73" cy="58" rx="7" ry="8" class="eye"/><circle cx="48" cy="60" r="3.2" class="pupil"/><circle cx="74" cy="60" r="3.2" class="pupil"/><circle cx="37" cy="74" r="5" class="cheek"/><circle cx="83" cy="74" r="5" class="cheek"/><ellipse cx="60" cy="80" rx="8" ry="2" class="mouth"/>';
-  const g=myst?'?':LAYERS[layer].g;
-  return `<svg viewBox="0 0 120 194" class="char" aria-hidden="true"><ellipse cx="60" cy="186" rx="40" ry="6" class="shadow"/><g class="fig">
-   <ellipse cx="45" cy="184" rx="13" ry="6" class="acc"/><ellipse cx="75" cy="184" rx="13" ry="6" class="acc"/>
-   <g class="arm-l"><rect x="13" y="104" width="18" height="50" rx="9" class="arm"/><rect x="13" y="104" width="18" height="50" rx="9" class="armsh"/></g>
-   <g class="arm-r"><rect x="89" y="104" width="18" height="50" rx="9" class="arm"/><rect x="89" y="104" width="18" height="50" rx="9" class="armsh"/></g>
-   <rect x="28" y="96" width="64" height="86" rx="28" class="body"/><rect x="41" y="122" width="38" height="40" rx="15" class="belly"/><text x="60" y="149" class="glyph">${g}</text>
-   <circle cx="60" cy="62" r="36" class="head"/>${myst?'':accessory(layer)}${face}</g></svg>`;
+  const id='bc'+(myst?'m':layer)+(++charSeq);
+  const c=myst?'#6C6F88':LHEX[layer], sk=myst?'#7E8199':SKIN[layer];
+  const S=`stroke="${OUT}" stroke-width="2.4" stroke-linejoin="round"`;
+  const defs=`<defs><linearGradient id="${id}c" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${lt(c,.3)}"/><stop offset=".55" stop-color="${c}"/><stop offset="1" stop-color="${dk(c,.3)}"/></linearGradient>
+    <radialGradient id="${id}s" cx=".36" cy=".3" r=".85"><stop offset="0" stop-color="${lt(sk,.25)}"/><stop offset=".6" stop-color="${sk}"/><stop offset="1" stop-color="${dk(sk,.25)}"/></radialGradient></defs>`;
+  const cloth=`url(#${id}c)`, skin=`url(#${id}s)`;
+  const robot=layer==='efectes'&&!myst;
+  const pants=robot?dk(sk,.25):'#2A2442';
+  const legs=`<path d="M55 160h13v40h-13z" fill="${pants}" ${S}/><path d="M72 160h13v40h-13z" fill="${pants}" ${S}/>
+    <path d="M42 206c0-8 6-12 14-12h7c4 0 6 3 6 7v5z" fill="#F4F2FA" ${S}/><path d="M71 206v-5c0-4 2-7 6-7h7c8 0 14 4 14 12z" fill="#F4F2FA" ${S}/>
+    <path d="M48 200h12M80 200h12" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`;
+  const torso=`<path d="M38 114c0-12 9-18 20-18h24c11 0 20 6 20 18v44c0 6-4 10-10 10H48c-6 0-10-4-10-10z" fill="${cloth}" ${S}/>
+    <path d="M45 117c3-5 8-7 13-7" stroke="#fff" stroke-opacity=".4" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M62 97l8 9 8-9" fill="none" stroke="${dk(c,.35)}" stroke-width="2.4" stroke-linejoin="round"/>`;
+  const emblem=myst?`<circle cx="70" cy="138" r="11" fill="#fff" ${S} stroke-width="2"/><text x="70" y="144" class="glyph" fill="${OUT}">?</text>`
+    :`<circle cx="70" cy="138" r="11" fill="#fff" ${S} stroke-width="2"/><g transform="translate(61.6 129.6) scale(.7)" fill="none" stroke="${c}" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[layer]}</g>`;
+  const arm=(cls,d,hx,hy,before='',after='')=>`<g class="${cls}"><path d="${d}" stroke="${OUT}" stroke-width="16.5" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${c}" stroke-width="11.5" fill="none" stroke-linecap="round"/><path d="${d}" stroke="#fff" stroke-opacity=".18" stroke-width="4" fill="none" stroke-linecap="round"/>${before}<circle cx="${hx}" cy="${hy}" r="7" fill="${skin}" ${S}/>${after}</g>`;
+  const neck=`<path d="M63 88h14v12H63z" fill="${dk(sk,.18)}" ${S} stroke-width="1.6"/>`;
+  const ears=`<circle cx="37" cy="66" r="7" fill="${skin}" ${S}/><circle cx="103" cy="66" r="7" fill="${skin}" ${S}/>`;
+  const skull=`<circle cx="70" cy="62" r="33" fill="${skin}" ${S}/>`;
+  const eyes=`<g class="eyes"><ellipse cx="58" cy="64" rx="6.5" ry="7.5" fill="#fff" ${S} stroke-width="1.6"/><ellipse cx="82" cy="64" rx="6.5" ry="7.5" fill="#fff" ${S} stroke-width="1.6"/><circle cx="59" cy="65.5" r="3.7" fill="#231B3A"/><circle cx="83" cy="65.5" r="3.7" fill="#231B3A"/><circle cx="60.4" cy="63.8" r="1.3" fill="#fff"/><circle cx="84.4" cy="63.8" r="1.3" fill="#fff"/></g>`;
+  const face=eyes+`<path d="M51 54q7-5 14-1M75 53q7-4 14 1" stroke="${OUT}" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+    <path d="M70 69q3.5 4-1 6.5" stroke="${dk(sk,.35)}" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <ellipse cx="49" cy="77" rx="6" ry="3.4" fill="#FF6F86" opacity=".3"/><ellipse cx="91" cy="77" rx="6" ry="3.4" fill="#FF6F86" opacity=".3"/>
+    <ellipse cx="70" cy="83" rx="7" ry="2" class="mouth" fill="#3A1426" ${S} stroke-width="1.6"/>`;
+  const stick=(x1,y1,x2,y2)=>`<path d="M${x1} ${y1}L${x2} ${y2}" stroke="${OUT}" stroke-width="6" stroke-linecap="round"/><path d="M${x1} ${y1}L${x2} ${y2}" stroke="#EBCB92" stroke-width="3.2" stroke-linecap="round"/><circle cx="${x2}" cy="${y2}" r="3" fill="#EBCB92" ${S} stroke-width="1.4"/>`;
+  let back='',props='',armL,armR,headpart,calm=false;
+  if(myst){
+    armL=arm('arm-l','M42 112q-10 10-14 28',28,142);armR=arm('arm-r','M98 112q10 10 14 28',112,142);
+    headpart=neck+ears+skull+`<text x="70" y="76" class="q">?</text>`;
+  }else switch(layer){
+    case 'ritme':
+      armL=arm('arm-l','M42 112q-12 8-16 28',26,142,stick(26,142,8,114));
+      armR=arm('arm-r','M98 112q12 8 16 28',114,142,stick(114,142,132,114));
+      headpart=neck+ears+skull+`<path d="M38 60q0-8 4-12v14zM102 60q0-8-4-12v14z" fill="${HAIR.ritme}"/>`+face+
+        `<path d="M36 57c0-21 14-33 34-33s34 12 34 33c-20-7-48-7-68 0z" fill="${cloth}" ${S}/>
+         <path d="M37 56c-9-1-18 2-21 8 8 3 17 1 23-3z" fill="${dk(c,.32)}" ${S}/>
+         <circle cx="70" cy="26" r="3.6" fill="${dk(c,.32)}" ${S} stroke-width="1.6"/>
+         <path d="M48 49q22-7 44 0" stroke="#fff" stroke-opacity=".45" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+      break;
+    case 'baix':
+      calm=true;
+      props=`<g transform="rotate(-24 60 150)"><path d="M43 150c0-9 6-14 14-14 5 0 7 3 11 3s6-3 10-3c7 0 11 6 11 12 0 9-8 16-23 16-15 0-23-6-23-14z" fill="#F3E9D2" ${S}/>
+        <path d="M52 151c4-3 10-3 14 0" stroke="${dk(c,.15)}" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <rect x="88" y="146" width="44" height="6" rx="2" fill="#9A6332" ${S} stroke-width="1.8"/><rect x="130" y="143" width="12" height="12" rx="3" fill="${OUT}"/>
+        <path d="M58 147.5h74M58 150.5h74" stroke="#E6E3EE" stroke-width=".9"/></g>`;
+      armL=arm('arm-l','M42 114q-8 18 14 30',56,144);
+      armR=arm('arm-r','M98 114q10 2 12 13',110,127);
+      headpart=neck+ears+skull+`<path d="M38 56c0-22 14-32 32-32s32 10 32 32c-8-8-20-11-32-11s-24 3-32 11z" fill="${HAIR.baix}" ${S}/>`+face+
+        `<path d="M33 64c0-30 16-46 37-46s37 16 37 46" stroke="${OUT}" stroke-width="9" fill="none" stroke-linecap="round"/>
+         <path d="M33 64c0-30 16-46 37-46s37 16 37 46" stroke="#3B3456" stroke-width="5" fill="none" stroke-linecap="round"/>
+         <rect x="24" y="52" width="17" height="27" rx="7" fill="${cloth}" ${S}/><rect x="99" y="52" width="17" height="27" rx="7" fill="${cloth}" ${S}/>
+         <path d="M28 58v14M112 58v14" stroke="#fff" stroke-opacity=".35" stroke-width="2.4" stroke-linecap="round"/>`;
+      break;
+    case 'harmonia':
+      calm=true;
+      props=`<rect x="22" y="140" width="96" height="21" rx="5" fill="#25203A" ${S}/><rect x="28" y="146" width="84" height="11" rx="2" fill="#fff"/>
+        <path d="M38.5 146v11M49 146v11M59.5 146v11M70 146v11M80.5 146v11M91 146v11M101.5 146v11" stroke="#B9B4CC" stroke-width="1"/>
+        <path d="M34 146v6.5M44 146v6.5M65 146v6.5M75 146v6.5M86 146v6.5M96 146v6.5" stroke="#25203A" stroke-width="3.6"/>
+        <circle cx="28" cy="143" r="1.6" fill="${lt(c,.2)}"/><circle cx="33" cy="143" r="1.6" fill="#F2C14E"/><circle cx="38" cy="143" r="1.6" fill="#E5484D"/>`;
+      armL=arm('arm-l','M42 114q-8 16 2 32',44,148);
+      armR=arm('arm-r','M98 114q8 16-2 32',96,148);
+      headpart=neck+ears+skull+`<path d="M41 58c4-6 10-8 16-6 4-4 12-5 18-2 6-3 14-2 18 3" fill="none" stroke="${HAIR.harmonia}" stroke-width="7" stroke-linecap="round"/>`+face+
+        `<g fill="#fff" fill-opacity=".14" stroke="${OUT}" stroke-width="2.4"><circle cx="58" cy="65" r="10"/><circle cx="82" cy="65" r="10"/></g>
+         <path d="M68 64q2-2 4 0M48 63l-10-3M92 63l10-3" stroke="${OUT}" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+         <path d="M37 54c0-22 15-34 33-34s33 12 33 34z" fill="${cloth}" ${S}/>
+         <rect x="34" y="47" width="72" height="12" rx="6" fill="${dk(c,.22)}" ${S}/>
+         <path d="M44 50v6M52 50v6M60 50v6M68 50v6M76 50v6M84 50v6M92 50v6" stroke="${OUT}" stroke-opacity=".25" stroke-width="1.6"/>
+         <circle cx="70" cy="18" r="7.5" fill="#fff" ${S}/>`;
+      break;
+    case 'melodia':
+      back=`<g fill="${HAIR.melodia}" ${S}><circle cx="40" cy="60" r="14"/><circle cx="43" cy="40" r="15"/><circle cx="57" cy="27" r="16"/><circle cx="83" cy="27" r="16"/><circle cx="97" cy="40" r="15"/><circle cx="100" cy="60" r="14"/><circle cx="70" cy="22" r="15"/></g>`;
+      armL=arm('arm-l','M42 112q-14 2-18-16',24,96);
+      armR=arm('arm-r','M98 112q16 0 10-24',108,88,`<path d="M108 90l2 18" stroke="${OUT}" stroke-width="7" stroke-linecap="round"/><path d="M108 90l2 18" stroke="#4A4560" stroke-width="4" stroke-linecap="round"/>`,
+        `<circle cx="105" cy="79" r="7.5" fill="#C9CCD8" ${S}/><path d="M99.5 77h11M99 81h12" stroke="#8D90A3" stroke-width="1.2"/>`);
+      headpart=neck+ears+`<circle cx="37" cy="76" r="4.5" fill="none" stroke="#F2C14E" stroke-width="2.2"/><circle cx="103" cy="76" r="4.5" fill="none" stroke="#F2C14E" stroke-width="2.2"/>`+skull+
+        `<path d="M42 47c6-10 18-15 28-13 10-2 22 3 28 13-6-3-12-3-17 0-4-4-17-4-22 0-5-3-11-3-17 0z" fill="${HAIR.melodia}"/>`+face;
+      break;
+    case 'efectes':{
+      props=`<rect x="52" y="122" width="36" height="30" rx="6" fill="#1D1934" ${S} stroke-width="2"/><circle cx="61" cy="132" r="3" fill="${lt(c,.3)}"/><circle cx="70" cy="132" r="3" fill="#F2C14E"/><circle cx="79" cy="132" r="3" fill="#E5484D"/><path d="M58 144h24" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`;
+      const vinyl=`<circle cx="20" cy="146" r="13" fill="#141126" ${S}/><circle cx="20" cy="146" r="8.5" fill="none" stroke="#3A3456" stroke-width="1"/><circle cx="20" cy="146" r="4" fill="${c}"/>`;
+      armL=arm('arm-l','M42 112q-12 8-14 26',28,140,vinyl);
+      armR=arm('arm-r','M98 112q12 8 14 26',112,140);
+      headpart=`<path d="M70 28V13" stroke="${OUT}" stroke-width="3"/><circle cx="70" cy="10" r="11" class="glow"/><circle cx="70" cy="10" r="5.5" fill="${lt(c,.2)}" ${S} stroke-width="2"/>`+neck+
+        `<rect x="27" y="50" width="10" height="22" rx="3" fill="${dk(sk,.22)}" ${S}/><rect x="103" y="50" width="10" height="22" rx="3" fill="${dk(sk,.22)}" ${S}/>
+         <rect x="34" y="28" width="72" height="64" rx="20" fill="${skin}" ${S}/>
+         <path d="M42 36q14-5 28-5" stroke="#fff" stroke-opacity=".55" stroke-width="3" fill="none" stroke-linecap="round"/>
+         <rect x="42" y="48" width="56" height="26" rx="13" fill="#141126" ${S}/>
+         <g class="eyes"><rect x="52" y="56" width="12" height="10" rx="5" fill="${lt(c,.35)}"/><rect x="76" y="56" width="12" height="10" rx="5" fill="${lt(c,.35)}"/></g>
+         <rect x="47" y="51" width="22" height="4" rx="2" fill="#fff" opacity=".2"/>
+         <ellipse cx="70" cy="83" rx="9" ry="2" class="mouth" fill="${lt(c,.25)}" ${S} stroke-width="1.6"/>`;
+      break;}
+  }
+  const em=(layer==='efectes'&&!myst)?'':emblem;
+  return `<svg viewBox="0 0 140 220" class="char${calm?' calm':''}" aria-hidden="true">${defs}<ellipse class="glow" cx="70" cy="209" rx="54" ry="10"/><ellipse class="shadow" cx="70" cy="209" rx="40" ry="6"/><g class="fig">${back}${legs}${torso}${em}${props}${armL}${armR}<g class="head">${headpart}</g></g></svg>`;
 }
 
 function renderSlot(i){
@@ -932,7 +1112,7 @@ function renderSlot(i){
   if(sl.muted)el.classList.add('muted');
   if(sl.solo)el.classList.add('soloed');
   const nm=my?'???':snd.name, ly=my?'Misteri':L.name;
-  el.innerHTML=`<div class="beam" aria-hidden="true"></div><button class="figbtn" aria-label="${my?(dictat.active?'Revela aquest so':'So misteriós'):(sl.muted?'Activa ':'Silencia ')+snd.name}">${charSVG(snd.layer,my)}</button>
+  el.innerHTML=`<div class="beam" aria-hidden="true"></div><div class="lamp" aria-hidden="true"></div><button class="figbtn" aria-label="${my?(dictat.active?'Revela aquest so':'So misteriós'):(sl.muted?'Activa ':'Silencia ')+snd.name}">${charSVG(snd.layer,my)}</button>
    <div class="slot-name">${nm}</div><div class="slot-layer">${ly}</div>
    <div class="slot-ctl" ${mystery?'hidden':''}>
     <button data-a="m" aria-pressed="${sl.muted}" title="Silencia (mute)" aria-label="Silencia">M</button>
@@ -944,18 +1124,19 @@ function renderSlot(i){
 function renderSlots(){slots.forEach((_,i)=>renderSlot(i));}
 
 function nextBeat(){return Tone.Transport.state==='started'?Math.ceil(step/4)*4:step;}
-function assign(i,snd){
+function assign(i,snd,opt={}){
   const sl=slots[i];
   if(sl.inst){sl.inst.dispose();sl.inst=null;}
   sl.sound=snd;sl.muted=false;sl.solo=false;sl.revealed=false;sl.ch.mute=false;sl.ch.solo=false;
-  if(snd){sl.inst=makeInst(snd);sl.inst.out.connect(sl.ch);const L=LAYERS[snd.layer];sl.rev.gain.value=snd.rev??L.rev;sl.dly.gain.value=snd.dly??L.dly;sl.start=nextBeat();}
-  renderSlot(i);
+  if(snd){sl.inst=makeInst(snd);sl.inst.out.connect(sl.ch);const L=LAYERS[snd.layer];sl.rev.gain.value=snd.rev??L.rev;sl.dly.gain.value=snd.dly??L.dly;sl.start=opt.start??nextBeat();}
+  if(!opt.quiet)renderSlot(i);
 }
 function clearAll(){slots.forEach((_,i)=>assign(i,null));}
-function afterChange(){checkTex();renderPalette();renderSide();updateCode();tour.check();}
+function afterChange(){checkTex();renderPalette();renderSide();updateCode();renderForm();tour.check();}
 
 function slotAction(i,a){
   const sl=slots[i];if(!sl.sound||mystery)return;
+  if(arr.playing){toast('Ara sona la forma. Atura-la per editar.');return;}
   if(a==='m'){sl.muted=!sl.muted;sl.ch.mute=sl.muted;}
   else if(a==='s'){sl.solo=!sl.solo;sl.ch.solo=sl.solo;}
   else if(a==='x'){assign(i,null);if(inspect===i)inspect=null;}
@@ -964,6 +1145,7 @@ function slotAction(i,a){
 }
 
 function addSound(snd,slotIdx){
+  if(arr.playing){toast('Ara sona la forma. Atura-la per editar.');return;}
   if(mystery){toast(dictat.active?'Acaba el dictat per tornar a crear.':listen.playing?'Ara sona el repte. Prem «Torna a la meva mescla».':'Primer respon quin estil és.');return;}
   const used=slots.findIndex(s=>s.sound&&s.sound.id===snd.id);
   if(slotIdx==null){
@@ -1073,6 +1255,7 @@ function renderMeta(){
 }
 function drawStep(s){
   if(s%4===0)drawBeat(s);
+  if(arr.playing)drawTimeline(s);
   const g=document.getElementById('grid');if(!g)return;
   g.querySelectorAll('.cell.ph').forEach(c=>c.classList.remove('ph'));
   const len=+g.dataset.len||16;const k=s%len;const row=Math.floor(k/16),col=k%16;
@@ -1088,8 +1271,8 @@ function drawBeat(s){
 function renderPalette(){
   const used=new Set(mystery?[]:slots.filter(s=>s.sound).map(s=>s.sound.id));
   $('palette').innerHTML=LKEYS.map(l=>{const L=LAYERS[l];
-    const chips=style.sounds.filter(s=>s.layer===l).map(s=>`<button class="chip${used.has(s.id)?' used':''}" data-id="${s.id}" style="--c:var(--${l})"><span class="g" aria-hidden="true">${L.g}</span><span class="t">${hiddenStyle?'???':s.name}</span></button>`).join('');
-    return `<div class="prow" style="--c:var(--${l})" title="${L.desc}"><div class="phead"><b>${L.name}</b></div><div class="chips">${chips}</div></div>`;}).join('');
+    const chips=style.sounds.filter(s=>s.layer===l).map(s=>`<button class="chip${used.has(s.id)?' used':''}" data-id="${s.id}" style="--c:var(--${l})"><span class="g" aria-hidden="true">${icon(l)}</span><span class="t">${hiddenStyle?'???':s.name}</span></button>`).join('');
+    return `<div class="prow" style="--c:var(--${l})" title="${L.desc}"><div class="phead"><b>${icon(l)}${L.name}</b></div><div class="chips">${chips}</div></div>`;}).join('');
 }
 
 function layerRows(c){
@@ -1127,6 +1310,17 @@ function gridCard(){
     <h3 style="color:var(--${snd.layer})">${snd.name} <span class="muted" style="font-family:var(--f-body);font-size:13px;font-weight:400">${L.name}</span></h3>
     <div class="grid" id="grid" data-len="${len}">${head}${rows.join('')}</div><p class="hint">${expl}</p></div>`;
 }
+function textureViz(c){
+  const W=300,H=86,rowH=16,pad=6;
+  const rows=LKEYS.map((l,k)=>{const y=pad+k*rowH+rowH/2;const on=c[l]>0;const col=`var(--${l})`;let d='';
+    if(!on)return `<line x1="10" x2="${W-10}" y1="${y}" y2="${y}" class="off" stroke-width="1.5" stroke-dasharray="3 5"/>`;
+    if(l==='ritme'){for(let x=12;x<W-10;x+=17)d+=`M${x} ${y-5}v10`;return `<path d="${d}" stroke="${col}" stroke-width="3" stroke-linecap="round"/>`;}
+    if(l==='baix'){d=`M10 ${y}`;for(let x=10;x<W-10;x+=40)d+=` q10 -6 20 0 t20 0`;return `<path d="${d}" stroke="${col}" stroke-width="3.2" fill="none" stroke-linecap="round"/>`;}
+    if(l==='harmonia')return `<path d="M10 ${y-4}H${W-10}M10 ${y}H${W-10}M10 ${y+4}H${W-10}" stroke="${col}" stroke-width="2"/>`;
+    if(l==='melodia'){d=`M10 ${y}`;const pts=[0,-5,3,-2,5,-4,1,4,-3,2,-5,0];for(let i=1;i<=24;i++){const x=10+i*(W-20)/24;d+=` L${x.toFixed(1)} ${y+pts[i%pts.length]}`;}return `<path d="${d}" stroke="${col}" stroke-width="2.6" fill="none" stroke-linejoin="round" stroke-linecap="round"/>`;}
+    for(let x=24;x<W-10;x+=46)d+=`<path d="M${x} ${y-5}l1.6 3.4 3.4 1.6-3.4 1.6-1.6 3.4-1.6-3.4-3.4-1.6 3.4-1.6z" fill="${col}"/>`;return d;});
+  return `<svg class="tviz" viewBox="0 0 ${W} ${H}" role="img" aria-label="Dibuix de les capes que sonen">${rows.join('')}</svg>`;
+}
 function styleCard(){
   return `<div class="card"><span class="eyebrow">Fitxa de l'estil</span><h3 style="color:${style.accent}">${style.name}</h3>
   <dl class="kv"><dt>Origen</dt><dd>${style.origin}</dd><dt>Tempo</dt><dd>${style.bpm} BPM</dd><dt>Compàs</dt><dd>4/4</dd><dt>Tonalitat</dt><dd>${style.key}</dd></dl>
@@ -1139,6 +1333,7 @@ function renderSide(){
   if(mode==='crea'){
     const [tn,td]=texture(c);
     side.innerHTML=gridCard()+`<div class="card"><span class="eyebrow">Què sona ara · textura</span><h2>${tn}</h2><p class="muted">${td}</p>
+      ${textureViz(c)}
       <div class="layers">${layerRows(c)}</div>
       <div><div class="row" style="justify-content:space-between"><span class="eyebrow">Densitat</span><span class="eyebrow">${c.total} / 7</span></div><div class="dens"><i style="width:${c.total/7*100}%"></i></div></div></div>`+styleCard();
     return;
@@ -1146,7 +1341,8 @@ function renderSide(){
   const tabs=`<div class="subtabs" role="group" aria-label="Tipus de repte">
     <button data-sub="tex" aria-pressed="${sub==='tex'}">Textures</button>
     <button data-sub="esc" aria-pressed="${sub==='esc'}">Escolta i reprodueix</button>
-    <button data-sub="est" aria-pressed="${sub==='est'}">Quin estil és?</button></div>`;
+    <button data-sub="est" aria-pressed="${sub==='est'}">Quin estil és?</button>
+    <button data-sub="for" aria-pressed="${sub==='for'}">Forma</button></div>`;
   let body='';
   if(sub==='tex'){
     const [tn]=texture(c);
@@ -1163,6 +1359,14 @@ function renderSide(){
     ${listen.playing?'<p class="hint">Sona el repte (2 voltes). Després tornarà la teva mescla.</p>':''}
     <div class="row"><button class="btn" id="chkBtn" ${!listen.target||listen.playing?'disabled':''}>Comprova</button><button class="btn" id="hintBtn" ${!listen.target?'disabled':''}>Pista</button></div>
     ${hint}${fb}`;
+  }else if(sub==='for'){
+    const q=fq.answer;let res='';
+    if(fq.picked){const right=fq.picked===q;res=`<div class="fb ${right?'ok':'bad'}"><b>${right?'Correcte!':'No. Era '+FORMS[q].name+'.'}</b><span style="color:var(--ink)">${FORMS[q].t}: ${FORMS[q].d}</span></div>`;}
+    body=`<p class="muted">Sona una obra de tres seccions. Escolta quan torna una idea i quan n'apareix una de nova.</p>
+    <div class="row"><button class="btn primary" id="fqBtn">${arr.playing&&arr.quiz?'Sona…':q?'Una altra obra':'Escolta una obra'}</button>${arr.playing&&arr.quiz?'<button class="btn" id="fqStop">Atura</button>':''}</div>
+    ${q?`<div class="opts" style="grid-template-columns:repeat(3,1fr)">${Object.keys(FORMS).map(k=>`<button data-fq="${k}" class="${fq.picked?(k===q?'right':(k===fq.picked?'wrong':'')):''}">${FORMS[k].name}</button>`).join('')}</div>`:''}${res}
+    <span class="eyebrow" style="margin-top:6px">Crea les teves formes</span>
+    <div class="chal">${Object.keys(FORMS).map(k=>{const d=doneTex['forma:'+k];return `<div class="ch ${d?'done':''}"><b>${FORMS[k].name}</b><span>${FORMS[k].goal}</span><span class="st">${d?'Fet ★':'+1 ★'}</span></div>`;}).join('')}</div>`;
   }else{
     const q=quiz.answer;
     let res='';
@@ -1178,16 +1382,18 @@ function renderSide(){
 function codeOf(){return style.code+'-'+slots.map(s=>s.sound&&!mystery?s.sound.idx.toString(36).toUpperCase():'_').join('');}
 function updateCode(){$('codeOut').textContent=codeOf();}
 function loadCode(str,silent){
-  const m=/^(HH|RG|TC|TR|RC)-([0-9A-J_]{7})$/i.exec(str.trim());
+  const m=CODE_RE.exec(str.trim());
   if(!m){toast('Codi no vàlid. Ha de ser com HH-0A_F___');return;}
   const k=Object.keys(STYLES).find(k=>STYLES[k].code===m[1].toUpperCase());
   if(listen.playing)stopListen();
   setStyle(k);
   [...m[2].toUpperCase()].forEach((ch,i)=>{if(ch!=='_'){const s=STYLES[k].sounds[parseInt(ch,36)];if(s)assign(i,s);}});
-  if(!silent)ensureAudio();afterChange();toast('Mescla carregada');
+  if(m[5]){const S=curSecs();S.A=snapFromCode(k,m[2]);S.B=snapFromCode(k,m[3]);S.C=snapFromCode(k,m[4]);form.type=m[5].toUpperCase();form.editing='A';}
+  if(!silent)ensureAudio();afterChange();toast(m[5]?'Obra carregada':'Mescla carregada');
 }
 
 function setStyle(k,keepHidden){
+  if(arr.playing&&!arr.quiz)endArrangement(false);
   if(listen.playing){listen.playing=false;mystery=false;}
   if(!keepHidden){hiddenStyle=false;mystery=false;dictat.active=false;}
   style=STYLES[k];app.dataset.style=k;
@@ -1246,6 +1452,7 @@ document.addEventListener('keydown',e=>{
 });
 function setMode(m){
   if(mode===m)return;mode=m;
+  if(arr.playing&&arr.quiz)endArrangement(false);
   if(m==='crea'){if(listen.playing)stopListen();if(hiddenStyle){hiddenStyle=false;mystery=false;quiz.picked=quiz.answer;renderSlots();renderStyles();renderMeta();}}
   if(m!=='prof'){if(dictat.active)endDictat();if(prof.proj)setProj(false);}
   if(m==='prof'){if(listen.playing)stopListen();if(hiddenStyle){hiddenStyle=false;mystery=false;quiz.picked=quiz.answer;renderSlots();renderStyles();renderMeta();}}
@@ -1261,6 +1468,7 @@ $('side').addEventListener('click',e=>{
   if(t.dataset.sub){if(listen.playing)stopListen();if(hiddenStyle&&t.dataset.sub!=='est'){hiddenStyle=false;mystery=false;quiz.picked=quiz.answer;renderSlots();renderStyles();renderMeta();}sub=t.dataset.sub;renderSide();renderPalette();return;}
   if(t.dataset.lvl){listen.level=+t.dataset.lvl;listen.target=null;listen.fb=null;listen.showHint=false;renderSide();return;}
   if(t.dataset.q){answerQuiz(t.dataset.q);return;}
+  if(t.dataset.fq){if(!fq.picked){fq.picked=t.dataset.fq;if(fq.picked===fq.answer)addStars(2,t);renderSide();}return;}
   if(t.dataset.dlv){dictat.level=+t.dataset.dlv;renderSide();return;}
   if(t.dataset.tmin){startTimer(+t.dataset.tmin);return;}
   switch(t.id){
@@ -1270,6 +1478,8 @@ $('side').addEventListener('click',e=>{
     case 'chkBtn':checkListen();break;
     case 'hintBtn':listen.showHint=true;renderSide();break;
     case 'quizBtn':newQuiz();break;
+    case 'fqBtn':if(!(arr.playing&&arr.quiz))newFormQuiz();break;
+    case 'fqStop':endArrangement(false);break;
     case 'projOn':setProj(true);break;
     case 'dNew':startDictat();break;
     case 'dAll':slots.forEach((x,i)=>{if(x.sound){x.revealed=true;renderSlot(i);}});break;
@@ -1279,7 +1489,7 @@ $('side').addEventListener('click',e=>{
     case 'tStop':stopTimer();break;
   }
 });
-$('clearBtn').addEventListener('click',()=>{if(mystery)return;clearAll();afterChange();});
+$('clearBtn').addEventListener('click',()=>{if(mystery||arr.playing)return;clearAll();afterChange();});
 $('codeBtn').addEventListener('click',()=>{$('codeBox').hidden=!$('codeBox').hidden;updateCode();});
 $('copyBtn').addEventListener('click',()=>{const txt=codeOf();navigator.clipboard?.writeText(txt).then(()=>toast('Codi copiat'),()=>{const r=document.createRange();r.selectNodeContents($('codeOut'));const s=getSelection();s.removeAllRanges();s.addRange(r);toast('Selecciona i copia el codi');});});
 $('loadBtn').addEventListener('click',()=>loadCode($('codeIn').value));
@@ -1399,6 +1609,114 @@ $('shareOv').addEventListener('click',e=>{if(e.target.id==='shareOv')$('shareOv'
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('shareOv').hidden)$('shareOv').hidden=true;else if(prof.proj)setProj(false);}});
 $('shareCopy').addEventListener('click',()=>{const u=shareLink();navigator.clipboard?.writeText(u).then(()=>toast('Enllaç copiat'),()=>toast('Selecciona l\'enllaç i copia\'l'));});
 
+/* ---------- Forma musical ---------- */
+const FORMS={
+  ABA:{name:'A-B-A',t:'Forma ternària',d:'Una idea, un contrast i la tornada a la primera idea.',goal:'Desa A i B diferents i escolta la forma sencera.'},
+  ABC:{name:'A-B-C',t:'Forma encadenada',d:'Cada secció és nova: la música avança sense tornar enrere, com una història.',goal:'Desa tres seccions diferents i escolta-les encadenades.'},
+  AAA:{name:'A-A-A',t:'Forma estròfica',d:'La mateixa secció es repeteix, com les estrofes d\'una cançó popular.',goal:'Desa una secció A i fes-la sonar tres vegades.'}
+};
+const CODE_RE=/^(HH|RG|TC|TR|RC)-([0-9A-J_]{7})(?:-([0-9A-J_]{7})-([0-9A-J_]{7})-(ABA|ABC|AAA))?$/i;
+const SOUND_BY_ID={};Object.values(STYLES).forEach(st=>st.sounds.forEach(x=>SOUND_BY_ID[x.id]=x));
+const form={type:'ABA',by:{},loops:1,editing:null};
+const arr={playing:false,order:null,secs:null,len:64,idx:-1,s0:0,quiz:false,record:false,saved:null};
+const fq={answer:null,picked:null};
+const curSecs=()=>form.by[style.key_]||(form.by[style.key_]={A:null,B:null,C:null});
+const snapshot=()=>slots.map(s=>s.sound?{id:s.sound.id,m:s.muted}:null);
+const snapEmpty=sn=>!sn||sn.every(t=>!t||t.m);
+const snapCode=sn=>sn?sn.map(t=>t&&!t.m?SOUND_BY_ID[t.id].idx.toString(36).toUpperCase():'_').join(''):'_______';
+const snapFromCode=(k,str)=>{if(!str||/^_+$/.test(str))return null;return [...str.toUpperCase()].map(ch=>ch==='_'?null:{id:k+parseInt(ch,36),m:false});};
+const snapFromSounds=list=>{const sn=Array(7).fill(null);list.forEach((x,i)=>sn[i]={id:x.id,m:false});return sn;};
+function applyMix(sn,start){
+  for(let i=0;i<7;i++){const t=sn&&sn[i];const snd=t?SOUND_BY_ID[t.id]:null;const sl=slots[i];
+    if(sl.sound!==snd)assign(i,snd,{start,quiet:true});
+    if(snd){sl.muted=!!t.m;sl.ch.mute=sl.muted;sl.solo=false;sl.ch.solo=false;}}
+}
+function workCode(){const S=curSecs();return style.code+'-'+['A','B','C'].map(L=>snapCode(S[L])).join('-')+'-'+form.type;}
+function renderForm(){
+  const box=$('formBox');if(!box)return;
+  const S=curSecs(),F=FORMS[form.type],order=form.type.split('');
+  const need=new Set(order);
+  const quizNow=arr.playing&&arr.quiz;
+  const bars=4*(arr.playing?arr.len/64:form.loops);
+  const secCard=L=>{const sn=S[L];const dots=snapEmpty(sn)?'<span>Buida</span>':sn.filter(t=>t&&!t.m).map(t=>`<i style="--c:var(--${SOUND_BY_ID[t.id].layer})" title="${SOUND_BY_ID[t.id].name}"></i>`).join('');
+    return `<div class="fsec ${need.has(L)?'':'unused'} ${form.editing===L&&!arr.playing?'editing':''}" style="--sc:var(--sec${L})"><span class="fl">${L}</span><span class="fdots">${dots}</span>
+      <div class="row"><button class="btn" data-fsave="${L}" ${arr.playing?'disabled':''}>Desa aquí</button><button class="btn" data-fload="${L}" ${snapEmpty(sn)||arr.playing?'disabled':''}>Edita</button></div></div>`;};
+  const blocks=order.map((L,k)=>`<div class="tblk ${!quizNow&&snapEmpty(S[L])?'empty':''}" data-k="${k}" style="--sc:${quizNow?'var(--mystery)':`var(--sec${L})`}"><small>c. ${k*bars+1}–${(k+1)*bars}</small><span>${quizNow?'?':L}</span><i></i></div>`).join('');
+  box.innerHTML=`<div class="fhead"><div><span class="eyebrow">Forma musical</span><h3>${F.name} · ${F.t}</h3><p>${F.d}</p></div>
+    <div class="seg" role="group" aria-label="Estructura">${Object.keys(FORMS).map(k=>`<button data-form="${k}" aria-pressed="${form.type===k}" ${arr.playing?'disabled':''}>${FORMS[k].name}</button>`).join('')}</div></div>
+    <div class="fsecs">${['A','B','C'].map(secCard).join('')}</div>
+    <div class="timeline" aria-label="Línia de temps de la forma">${blocks}</div>
+    <div class="fctl">
+      ${arr.playing&&!arr.quiz?'<button class="btn primary" id="fStop"><svg class="ic fillc" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>Atura</button>'
+        :`<button class="btn primary" id="fPlay" ${quizNow?'disabled':''}><svg class="ic fillc" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l13 8-13 8z"/></svg>Reprodueix la forma</button>
+          <button class="btn rec" id="fRec" ${quizNow?'disabled':''}><span class="dot"></span>Grava la forma</button>`}
+      <span class="eyebrow">Compassos per secció</span>
+      <div class="seg" role="group" aria-label="Compassos per secció">${[[1,'4'],[2,'8']].map(([n,t])=>`<button data-loops="${n}" aria-pressed="${form.loops===n}" ${arr.playing?'disabled':''}>${t}</button>`).join('')}</div>
+      <span class="spacer"></span>
+      <span class="muted" style="font-size:13px">Codi de l'obra</span><code id="workCode">${workCode()}</code><button class="btn" id="fCopy">Copia</button>
+    </div>`;
+}
+function drawTimeline(s){
+  const rel=s-arr.s0,k=Math.floor(rel/arr.len),p=(rel%arr.len)/arr.len;
+  document.querySelectorAll('#formBox .tblk').forEach((el,i)=>{el.classList.toggle('on',i===k);el.style.setProperty('--p',i<k?1:i===k?p.toFixed(3):0);});
+}
+async function startArrangement({order,secs,quiz=false,record=false,loops=form.loops}){
+  if(arr.playing)return;
+  if(Tone.context.state!=='running'){await ensureAudio();if(Tone.context.state!=='running')return;}
+  if(listen.playing)stopListen();if(dictat.active)endDictat();
+  arr.saved=snapshot();
+  Object.assign(arr,{order,secs,quiz,record,len:64*loops,idx:0,s0:0,playing:true});
+  if(quiz)mystery=true;
+  Tone.Transport.stop();step=0;applyMix(secs[order[0]],0);
+  Tone.Transport.start('+0.05');setTimeout(renderPlay,120);
+  renderSlots();afterChange();
+  if(record&&recorder.state!=='started')$('recBtn').click();
+  renderForm();if(quiz)renderSide();
+}
+function endArrangement(natural){
+  const wasQuiz=arr.quiz,wasRec=arr.record;
+  arr.playing=false;arr.quiz=false;arr.record=false;arr.idx=-1;
+  if(Tone.Transport.state==='started')Tone.Transport.pause();
+  mystery=false;applyMix(arr.saved,nextBeat());renderSlots();
+  if(wasRec&&recorder.state==='started')$('recBtn').click();
+  if(natural&&!wasQuiz)checkForm();
+  renderPlay();afterChange();
+}
+function checkForm(){
+  const S=curSecs(),t=form.type,c=L=>snapCode(S[L]);
+  const ok=t==='AAA'?!snapEmpty(S.A):t==='ABA'?(!snapEmpty(S.A)&&!snapEmpty(S.B)&&c('A')!==c('B')):(!snapEmpty(S.A)&&!snapEmpty(S.B)&&!snapEmpty(S.C)&&c('A')!==c('B')&&c('B')!==c('C')&&c('A')!==c('C'));
+  if(ok&&!doneTex['forma:'+t]){doneTex['forma:'+t]=1;saveProgress();addStars(1,$('formBox'));toast('Repte de forma superat: '+FORMS[t].name+' ★');}
+}
+function playForm(record){
+  const S=curSecs(),order=form.type.split('');
+  const miss=[...new Set(order)].find(L=>snapEmpty(S[L]));
+  if(miss){toast(`Primer desa una mescla a la secció ${miss}.`);return;}
+  if(mystery){toast('Acaba el repte o el dictat abans de reproduir la forma.');return;}
+  startArrangement({order,secs:{A:S.A,B:S.B,C:S.C},record});
+}
+function newFormQuiz(){
+  const types=Object.keys(FORMS);fq.answer=types[Math.floor(Math.random()*types.length)];fq.picked=null;
+  const mk=()=>snapFromSounds(pickMix(style,3+Math.floor(Math.random()*2)));
+  const A=mk();let B=mk(),C=mk(),g=0;
+  while((snapCode(B)===snapCode(A)||snapCode(C)===snapCode(A)||snapCode(C)===snapCode(B))&&g++<20){B=mk();C=mk();}
+  startArrangement({order:fq.answer.split(''),secs:{A,B,C},quiz:true,loops:1});
+}
+$('formBox').addEventListener('click',e=>{
+  const t=e.target.closest('button');if(!t||t.disabled)return;
+  if(t.dataset.form){form.type=t.dataset.form;renderForm();return;}
+  if(t.dataset.loops){form.loops=+t.dataset.loops;renderForm();return;}
+  if(t.dataset.fsave){const L=t.dataset.fsave;if(mystery){toast('Ara no es pot desar: hi ha sons misteriosos.');return;}
+    const sn=snapshot();if(snapEmpty(sn)){toast('La mescla és buida: afegeix-hi sons primer.');return;}
+    curSecs()[L]=sn;form.editing=L;renderForm();toast(`Mescla desada a la secció ${L}`);return;}
+  if(t.dataset.fload){const L=t.dataset.fload;if(mystery)return;applyMix(curSecs()[L],nextBeat());form.editing=L;renderSlots();afterChange();toast(`Edites la secció ${L}. Quan acabis, prem «Desa aquí».`);return;}
+  switch(t.id){
+    case 'fPlay':playForm(false);break;
+    case 'fRec':playForm(true);break;
+    case 'fStop':endArrangement(false);break;
+    case 'fCopy':{const w=workCode();navigator.clipboard?.writeText(w).then(()=>toast('Codi de l\'obra copiat'),()=>{const r=document.createRange();r.selectNodeContents($('workCode'));const g=getSelection();g.removeAllRanges();g.addRange(r);toast('Selecciona i copia el codi');});break;}
+  }
+});
+
 /* ---------- Tutorial ---------- */
 const fillC=()=>{const c={ritme:0,baix:0,harmonia:0,melodia:0,efectes:0};slots.forEach(s=>{if(s.sound)c[s.sound.layer]++;});return c;};
 let tourStyle0=null;
@@ -1417,6 +1735,7 @@ const TOUR=[
  {el:'#prog',t:'Els acords i el compàs',d:'Els acords canvien a cada compàs. Els punts que s\'encenen són els 4 temps del compàs.'},
  {el:'#tempoBox',t:'Canvia el tempo',d:'Més BPM vol dir més ràpid i amb més energia. Menys BPM, més tranquil.',todo:'Mou el control de tempo.',ok:()=>Math.abs(Tone.Transport.bpm.value-style.bpm)>=5},
  {el:'#styles',t:'Canvia d\'estil',d:'Cada estil té els seus sons, el seu tempo i els seus acords.',todo:'Tria un altre estil.',enter:()=>{tourStyle0=style.key_;},ok:()=>style.key_!==tourStyle0},
+ {el:'#formBox',t:'La forma musical',d:'Desa la mescla com a secció A, crea\'n una altra per a la B i encadena-les: A-B-A, A-B-C o A-A-A.'},
  {el:'.actions',t:'Grava i entrega',d:'Amb «Grava» enregistres la teva mescla. Amb «Codi de la mescla» obtens un codi curt per entregar-la al professor.'},
  {el:'#modeRep',t:'Els reptes',d:'Hi trobaràs reptes de textura, d\'escolta i d\'estils per guanyar estrelles.',todo:'Prem «Reptes».',ok:()=>mode==='rep'},
  {t:'Ja ets de la colla!',d:'Ja saps fer servir BeatColla. Ara, a crear i a superar reptes!',btn:'Acaba',last:true}
@@ -1486,7 +1805,7 @@ $('lStyles').innerHTML=Object.entries(STYLES).map(([k,st])=>`<button class="lst"
 })();
 function handleHash(){const h=decodeURIComponent(location.hash.slice(1));
  if(h==='app'){$('landing').hidden=true;app.hidden=false;}
- else if(/^(HH|RG|TC|TR|RC)-[0-9A-J_]{7}$/i.test(h)){$('landing').hidden=true;app.hidden=false;if(tour.i>=0)tour.end(false);setMode('crea');loadCode(h,!started);}}
+ else if(CODE_RE.test(h)){$('landing').hidden=true;app.hidden=false;if(tour.i>=0)tour.end(false);setMode('crea');loadCode(h,!started);}}
 
 $('startTour').addEventListener('click',e=>{e.stopPropagation();tour.start();});
 

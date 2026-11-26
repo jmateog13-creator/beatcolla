@@ -10,6 +10,7 @@ Crea música per capes, en català, per a 1r d'ESO. Inspirat en la mecànica del
 - **Tutorial interactiu** de 17 passos.
 - **Visor «Què toca?»** amb el patró de cada so en semicorxeres.
 - **Reptes:** textures (monodia, melodia acompanyada, polifonia…), escolta i reprodueix, i quin estil és.
+- **Forma musical:** seccions A, B i C per construir formes A-B-A, A-B-C i A-A-A, amb reproducció encadenada, gravació i repte «Quina forma és?».
 - **Mode professor:** vista de projector, dictat de capes, QR per compartir una base amb la classe, ruleta de torns i temporitzador.
 - **Entregues:** gravació d'àudio i codi de mescla (per exemple `HH-04C____`).
 
@@ -17,6 +18,7 @@ Crea música per capes, en català, per a 1r d'ESO. Inspirat en la mecànica del
 
 - `…/beatcolla/#app` obre l'app sense la portada.
 - `…/beatcolla/#HH-04C____` obre directament aquesta mescla.
+- `…/beatcolla/#HH-04C____-1G_____-_______-ABA` obre una obra amb les seves seccions i la seva forma.
 
 ## Desenvolupament
 

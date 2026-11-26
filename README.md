@@ -1,11 +1,12 @@
 # BeatColla
 
-Crea música per capes, en català, per a 1r d'ESO. Inspirat en la mecànica dels creadors musicals per capes: arrossegues sons a uns personatges i tot encaixa a temps.
+Crea música per capes, en català, per a cicle superior de Primària i primers cursos d'ESO. Inspirat en la mecànica dels creadors musicals per capes: arrossegues sons a uns personatges i tot encaixa a temps.
 
 **Obre-la aquí:** https://jmateog13-creator.github.io/beatcolla/
 
 ## Què hi ha
 
+- **Dos nivells:** Primària (vocabulari senzill, botons amb paraules, menys dades) i ESO (acords, BPM, tonalitat, patrons).
 - **5 estils:** hip-hop, reggaeton, techno, trap i rumba catalana. 20 sons per estil, en 5 capes (ritme, baix, harmonia, melodia, efectes).
 - **Tutorial interactiu** de 17 passos.
 - **Visor «Què toca?»** amb el patró de cada so en semicorxeres.

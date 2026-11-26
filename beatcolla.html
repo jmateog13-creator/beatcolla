@@ -551,6 +551,20 @@ body{overflow-x:clip}
 /* App: tocs de color */
 header.top{position:relative; overflow:hidden}
 header.top::before{content:""; position:absolute; left:0; right:0; top:0; height:4px; background:linear-gradient(90deg, var(--ritme) 0 20%, var(--baix) 20% 40%, var(--harmonia) 40% 60%, var(--melodia) 60% 80%, var(--efectes) 80%)}
+
+/* ---------- Nivells ---------- */
+.lh-level{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center; font-weight:700; font-size:14px}
+.lh-level .seg{background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.25)}
+.lh-level .seg button{color:rgba(255,255,255,.8)}
+.lh-level .seg button[aria-pressed="true"]{background:#fff; color:#1A1540}
+.wrap[data-nivell="p"]{font-size:16px}
+.wrap[data-nivell="p"] .chip{padding:8px}
+.wrap[data-nivell="p"] .chip .t{font-size:14px}
+.wrap[data-nivell="p"] .slot-name{font-size:14.5px}
+.wrap[data-nivell="p"] .slot-ctl{grid-template-columns:1.5fr 1.1fr .8fr}
+.wrap[data-nivell="p"] .slot-ctl button{height:32px; font-family:var(--f-body); font-weight:700; font-size:11.5px}
+.wrap[data-nivell="p"] .shortcuts{display:none}
+.phead small{display:block; font-size:11.5px; color:var(--muted); line-height:1.2}
 </style>
 
 <div class="landing" id="landing" data-style="hh">
@@ -563,13 +577,14 @@ header.top::before{content:""; position:absolute; left:0; right:0; top:0; height
         <button class="lbtn-app" data-enter="app">Obre l'app</button>
       </nav>
       <div class="lh-copy">
-        <span class="lh-pill"><i></i>Música per capes · 1r d'ESO · en català</span>
+        <span class="lh-pill"><i></i>Cicle superior de Primària i primers cursos d'ESO · en català</span>
         <h1>Fes música amb la teva <span class="colla"><span>c</span><span>o</span><span>l</span><span>l</span><span>a</span></span>.</h1>
         <p class="lh-lead">Arrossega sons als personatges i construeix cançons de <b>hip-hop, reggaeton, techno, trap i rumba catalana</b>. No cal saber solfeig: l'aprens tocant.</p>
         <div class="cta">
           <button class="bigbtn go" data-enter="app"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3l12 7-12 7z" fill="currentColor"/></svg>Comença a crear</button>
           <button class="bigbtn outline" data-enter="tour">Fes el tutorial</button>
         </div>
+        <div class="lh-level"><span>El meu nivell</span><div class="seg lvlseg" role="group" aria-label="Nivell"><button data-nivell="p" aria-pressed="true">Primària</button><button data-nivell="e" aria-pressed="false">ESO</button></div></div>
       </div>
       <div class="lh-stage" aria-hidden="true"><div class="lchars" id="lChars"></div></div>
     </div>
@@ -606,7 +621,7 @@ header.top::before{content:""; position:absolute; left:0; right:0; top:0; height
       <div class="lsec">
         <h2>La música, capa a capa.</h2>
         <ul class="llist">
-          <li style="--c:var(--ritme)"><span class="sw"></span><div><b>Ritme i compàs</b><span>Pols, temps forts i semicorxeres en un compàs de 4/4.</span></div></li>
+          <li style="--c:var(--ritme)"><span class="sw"></span><div><b>Ritme i compàs</b><span>El pols, els temps forts i el compàs de quatre temps.</span></div></li>
           <li style="--c:var(--baix)"><span class="sw"></span><div><b>Baix i acords</b><span>Fonamental, tercera i quinta. Progressions com La m – Fa – Do – Sol.</span></div></li>
           <li style="--c:var(--harmonia)"><span class="sw"></span><div><b>Textura</b><span>Monodia, melodia acompanyada i polifonia, detectades en directe.</span></div></li>
           <li style="--c:var(--melodia)"><span class="sw"></span><div><b>Melodia</b><span>L'escala pentatònica, i per què sempre sona bé.</span></div></li>
@@ -637,7 +652,7 @@ header.top::before{content:""; position:absolute; left:0; right:0; top:0; height
         <li style="--c:var(--ritme)"><b>Entregues amb un codi</b><span>Cada mescla té un codi curt, com <code>HH-04C____</code>, que la reprodueix exactament.</span></li>
         <li style="--c:var(--baix)"><b>Gravació d'àudio</b><span>L'alumne grava la seva creació o l'obra sencera i la desa com a fitxer.</span></li>
         <li style="--c:var(--harmonia)"><b>Chromebook i mòbil</b><span>Es fa servir amb ratolí o amb el dit, i també a la pissarra digital.</span></li>
-        <li style="--c:var(--melodia)"><b>Tutorial guiat</b><span>18 passos interactius que esperen que l'alumne faci cada acció.</span></li>
+        <li style="--c:var(--melodia)"><b>Tutorial guiat</b><span>Passos interactius, adaptats al nivell, que esperen que l'alumne faci cada acció.</span></li>
         <li style="--c:var(--efectes)"><b>Vista de projector</b><span>Textura, acord i temps del compàs en gran per a la pissarra digital.</span></li>
         <li style="--c:var(--secA)"><b>Dictat de capes</b><span>Una mescla misteriosa que la classe ha d'endevinar. Revela els sons d'un en un.</span></li>
         <li style="--c:var(--secB)"><b>QR per a la classe</b><span>Comparteix la teva base: cada alumne l'obre al mòbil i hi afegeix capes.</span></li>
@@ -656,18 +671,19 @@ header.top::before{content:""; position:absolute; left:0; right:0; top:0; height
       <div class="final-chars" id="lChars2" aria-hidden="true"></div>
     </div>
   </section>
-  <footer class="lfoot lin"><span>BeatColla · Educació musical · 1r d'ESO</span><span>Sons generats amb síntesi en directe</span></footer>
+  <footer class="lfoot lin"><span>BeatColla · Educació musical · Primària i ESO</span><span>Sons generats amb síntesi en directe</span></footer>
 </div>
 
 <div class="wrap" id="app" data-style="hh" hidden>
   <header class="top">
-    <div class="logo"><svg class="mark" viewBox="0 0 30 30" aria-hidden="true"><rect x="2" y="12" width="5" height="16" rx="2.5"/><rect x="9" y="4" width="5" height="24" rx="2.5"/><rect x="16" y="9" width="5" height="19" rx="2.5"/><rect x="23" y="15" width="5" height="13" rx="2.5"/></svg>Beat<b>Colla</b><small>Crea música per capes · 1r d'ESO</small></div>
+    <div class="logo"><svg class="mark" viewBox="0 0 30 30" aria-hidden="true"><rect x="2" y="12" width="5" height="16" rx="2.5"/><rect x="9" y="4" width="5" height="24" rx="2.5"/><rect x="16" y="9" width="5" height="19" rx="2.5"/><rect x="23" y="15" width="5" height="13" rx="2.5"/></svg>Beat<b>Colla</b><small>Crea música per capes</small></div>
     <div class="seg" role="group" aria-label="Mode">
       <button id="modeCrea" aria-pressed="true">Crea</button>
       <button id="modeRep" aria-pressed="false">Reptes</button>
       <button id="modeProf" aria-pressed="false">Professor</button>
     </div>
     <div class="spacer"></div>
+    <div class="seg lvlseg" role="group" aria-label="Nivell"><button data-nivell="p" aria-pressed="true">Primària</button><button data-nivell="e" aria-pressed="false">ESO</button></div>
     <button class="btn primary" id="projExit" hidden>Surt del projector</button>
     <button class="btn" id="homeBtn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>Inici</button>
     <button class="btn" id="tourBtn"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7"/><path d="M12 17h.01"/></svg>Tutorial</button>
@@ -1065,6 +1081,18 @@ const $=id=>document.getElementById(id);
 const app=$('app');
 let mode='crea', sub='tex', mystery=false, hiddenStyle=false, started=false, inspect=null;
 const listen={target:null,saved:null,playing:false,until:Infinity,level:3,fb:null};
+let lvl='p';try{if(localStorage.getItem('beatcolla.nivell')==='e')lvl='e';}catch(e){}
+const kid=()=>lvl==='p';
+const SUB={ritme:'Tambors i percussió',baix:'Les notes greus',harmonia:'Els acords',melodia:'El que es canta',efectes:'Les sorpreses'};
+const KID={
+  hh:['El bombo i la caixa fan «bum… pam».','El ritme es gronxa.','Sona el scratch del DJ.'],
+  rg:['Ritme «dembow»: es repeteix tota l\'estona.','El bombo sona a cada temps.','Convida a ballar.'],
+  tc:['El bombo no para: un a cada temps.','Sons d\'ordinador i sintetitzadors.','Es repeteix molt i canvia a poc a poc.'],
+  tr:['Baix molt greu i llarg.','Xerrics de plats molt ràpids.','La caixa sona poques vegades.'],
+  rc:['La guitarra fa el «ventilador».','Palmes i bongos.','És alegre i es pot ballar.']
+};
+const speedWord=b=>b<95?'Tranquil':b<=115?'Mogut':'Ràpid';
+const tempoText=v=>{if(!kid())return v+' BPM';const d=v-style.bpm;return d>=10?'Més ràpid':d<=-10?'Més lent':'Normal';};
 const quiz={answer:null,picked:null};
 let stars=0, doneTex={};
 try{stars=+localStorage.getItem('beatcolla.stars')||0;doneTex=JSON.parse(localStorage.getItem('beatcolla.tex')||'{}')||{};}catch(e){}
@@ -1214,9 +1242,9 @@ function renderSlot(i){
   el.innerHTML=`<div class="beam" aria-hidden="true"></div><div class="lamp" aria-hidden="true"></div><button class="figbtn" aria-label="${my?(dictat.active?'Revela aquest so':'So misteriós'):(sl.muted?'Activa ':'Silencia ')+snd.name}">${charSVG(snd.layer,my)}</button>
    <div class="slot-name">${nm}</div><div class="slot-layer">${ly}</div>
    <div class="slot-ctl" ${mystery?'hidden':''}>
-    <button data-a="m" aria-pressed="${sl.muted}" title="Silencia (mute)" aria-label="Silencia">M</button>
-    <button data-a="s" aria-pressed="${sl.solo}" title="Escolta només aquest (solo)" aria-label="Solo">S</button>
-    <button data-a="i" class="i" aria-pressed="${inspect===i}" title="Mira què toca" aria-label="Mira què toca">i</button>
+    <button data-a="m" aria-pressed="${sl.muted}" title="Silencia (mute)" aria-label="Silencia">${kid()?'Calla':'M'}</button>
+    <button data-a="s" aria-pressed="${sl.solo}" title="Escolta només aquest (solo)" aria-label="Solo">${kid()?'Sol':'S'}</button>
+    ${kid()?'':`<button data-a="i" class="i" aria-pressed="${inspect===i}" title="Mira què toca" aria-label="Mira què toca">i</button>`}
     <button data-a="x" title="Treu el so" aria-label="Treu el so">✕</button></div>`;
   sl.el=el;sl.mouth=el.querySelector('.mouth');sl.fig=el.querySelector('.char');
 }
@@ -1265,6 +1293,14 @@ function census(){
 }
 function texture(c){
   const others=c.total-c.melodia;
+  if(kid()){
+    if(c.total===0)return['Silenci','Posa músics a l\'escenari.'];
+    if(c.melodia===0&&c.harmonia===0&&c.efectes===0)return['Base rítmica','Tens el ritme. Falta una melodia per cantar.'];
+    if(c.melodia===0)return['Acompanyament','Falta la protagonista: la melodia.'];
+    if(c.melodia===1&&others===0)return['Monodia','Una melodia tota sola.'];
+    if(c.melodia>=2)return[others?'Polifonia acompanyada':'Polifonia','Dues melodies o més alhora.'];
+    return['Melodia acompanyada','Una melodia i altres sons que l\'acompanyen.'];
+  }
   if(c.total===0)return['Silenci','Afegeix sons arrossegant-los als personatges, o toca un so de la paleta.'];
   if(c.melodia===0&&c.harmonia===0&&c.efectes===0)return['Base rítmica','Hi ha ritme i/o baix, però cap melodia que es pugui cantar.'];
   if(c.melodia===0)return['Acompanyament','Hi ha acords i ritme, però falta la veu protagonista: la melodia.'];
@@ -1280,12 +1316,13 @@ const TEX=[
   {id:'acomp',t:'Melodia acompanyada',g:'1 Melodia + Ritme + Baix + Harmonia.',ok:c=>c.melodia===1&&c.ritme>=1&&c.baix>=1&&c.harmonia>=1},
   {id:'poli',t:'Polifonia',g:'2 melodies diferents alhora, amb acords de fons.',ok:c=>c.melodia>=2&&c.harmonia>=1},
   {id:'plena',t:'Textura plena',g:'Omple els 7 llocs fent servir les 5 capes.',ok:c=>c.total===7&&LKEYS.every(k=>c[k]>=1)},
-  {id:'solo',t:'Escolta el baix',g:'Amb 4 sons o més, fes servir S per sentir només el baix.',ok:c=>c.filled>=4&&c.total===1&&c.baix===1}
+  {id:'solo',t:'Escolta el baix',g:'Amb 4 sons o més, fes sonar només el baix.',ok:c=>c.filled>=4&&c.total===1&&c.baix===1}
 ];
+const texList=()=>kid()?TEX.filter(x=>['mono','base','acomp','solo'].includes(x.id)):TEX;
 function checkTex(){
   if(mystery)return;
   const c=census();
-  TEX.forEach(x=>{const k=style.key_+':'+x.id;if(!doneTex[k]&&x.ok(c)){doneTex[k]=1;saveProgress();addStars(1);toast('Repte superat: '+x.t+' ★');}});
+  texList().forEach(x=>{const k=style.key_+':'+x.id;if(!doneTex[k]&&x.ok(c)){doneTex[k]=1;saveProgress();addStars(1);toast('Repte superat: '+x.t+' ★');}});
 }
 
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
@@ -1345,12 +1382,12 @@ function renderPlay(){tour.check();const on=Tone.Transport.state==='started';$('
 function renderStyles(){
   $('styles').innerHTML=Object.entries(STYLES).map(([k,st])=>{
     const cur=k===style.key_;const hid=hiddenStyle;
-    return `<button class="stab" data-k="${k}" style="--sc:${st.accent}" aria-pressed="${cur&&!hid}" ${hid?'disabled':''}><span class="n">${st.name}</span><span class="m">${st.bpm} BPM · ${st.key}</span></button>`;}).join('');
+    return `<button class="stab" data-k="${k}" style="--sc:${st.accent}" aria-pressed="${cur&&!hid}" ${hid?'disabled':''}><span class="n">${st.name}</span><span class="m">${kid()?speedWord(st.bpm):st.bpm+' BPM · '+st.key}</span></button>`;}).join('');
 }
 function renderMeta(){
   $('mStyle').textContent=hiddenStyle?'Estil misteriós':style.name;
-  $('mInfo').textContent=hiddenStyle?'? BPM · 4/4':`${style.bpm} BPM · 4/4 · ${style.key}${style.swing?' · swing':''}`;
-  $('prog').innerHTML='<span class="proglbl">Acords</span>'+style.prog.map((d,b)=>`<div class="bar" data-b="${b}"><span class="c">${hiddenStyle?'?':chordName(style,d)}</span><span class="beats"><i></i><i></i><i></i><i></i></span></div>`).join('');
+  $('mInfo').textContent=kid()?(hiddenStyle?'Quin deu ser?':speedWord(style.bpm)+' · compta fins a 4'):hiddenStyle?'? BPM · 4/4':`${style.bpm} BPM · 4/4 · ${style.key}${style.swing?' · swing':''}`;
+  $('prog').innerHTML=`<span class="proglbl">${kid()?'Compàs':'Acords'}</span>`+style.prog.map((d,b)=>`<div class="bar" data-b="${b}"><span class="c">${kid()?b+1:hiddenStyle?'?':chordName(style,d)}</span><span class="beats"><i></i><i></i><i></i><i></i></span></div>`).join('');
 }
 function drawStep(s){
   if(s%4===0)drawBeat(s);
@@ -1371,7 +1408,7 @@ function renderPalette(){
   const used=new Set(mystery?[]:slots.filter(s=>s.sound).map(s=>s.sound.id));
   $('palette').innerHTML=LKEYS.map(l=>{const L=LAYERS[l];
     const chips=style.sounds.filter(s=>s.layer===l).map(s=>`<button class="chip${used.has(s.id)?' used':''}" data-id="${s.id}" style="--c:var(--${l})"><span class="g" aria-hidden="true">${icon(l)}</span><span class="t">${hiddenStyle?'???':s.name}</span></button>`).join('');
-    return `<div class="prow" style="--c:var(--${l})" title="${L.desc}"><div class="phead"><b>${icon(l)}${L.name}</b></div><div class="chips">${chips}</div></div>`;}).join('');
+    return `<div class="prow" style="--c:var(--${l})" title="${L.desc}"><div class="phead"><b>${icon(l)}${L.name}</b>${kid()?`<small>${SUB[l]}</small>`:''}</div><div class="chips">${chips}</div></div>`;}).join('');
 }
 
 function layerRows(c){
@@ -1421,6 +1458,8 @@ function textureViz(c){
   return `<svg class="tviz" viewBox="0 0 ${W} ${H}" role="img" aria-label="Dibuix de les capes que sonen">${rows.join('')}</svg>`;
 }
 function styleCard(){
+  if(kid())return `<div class="card"><span class="eyebrow">Coneix l'estil</span><h3 style="color:${style.accent}">${style.name}</h3>
+  <p><b>D'on ve:</b> ${style.origin}</p><p class="muted">${style.about}</p><span class="eyebrow">Escolta bé</span><ul class="feat">${KID[style.key_].map(f=>`<li>${f}</li>`).join('')}</ul></div>`;
   return `<div class="card"><span class="eyebrow">Fitxa de l'estil</span><h3 style="color:${style.accent}">${style.name}</h3>
   <dl class="kv"><dt>Origen</dt><dd>${style.origin}</dd><dt>Tempo</dt><dd>${style.bpm} BPM</dd><dt>Compàs</dt><dd>4/4</dd><dt>Tonalitat</dt><dd>${style.key}</dd></dl>
   <p class="muted">${style.about}</p><span class="eyebrow">Com el reconeixes</span><ul class="feat">${style.features.map(f=>`<li>${f}</li>`).join('')}</ul></div>`;
@@ -1434,7 +1473,7 @@ function renderSide(){
     side.innerHTML=gridCard()+`<div class="card"><span class="eyebrow">Què sona ara · textura</span><h2>${tn}</h2><p class="muted">${td}</p>
       ${textureViz(c)}
       <div class="layers">${layerRows(c)}</div>
-      <div><div class="row" style="justify-content:space-between"><span class="eyebrow">Densitat</span><span class="eyebrow">${c.total} / 7</span></div><div class="dens"><i style="width:${c.total/7*100}%"></i></div></div></div>`+styleCard();
+      <div><div class="row" style="justify-content:space-between"><span class="eyebrow">${kid()?'Músics sonant':'Densitat'}</span><span class="eyebrow">${c.total} / 7</span></div><div class="dens"><i style="width:${c.total/7*100}%"></i></div></div></div>`+styleCard();
     return;
   }
   const tabs=`<div class="subtabs" role="group" aria-label="Tipus de repte">
@@ -1447,7 +1486,7 @@ function renderSide(){
     const [tn]=texture(c);
     body=`<p class="muted">Construeix cada textura amb els sons de <b>${style.name}</b>. Quan l'aconsegueixis, es marca sola.</p>
     <p>Ara sona: <b>${tn}</b></p>
-    <div class="chal">${TEX.map(x=>{const d=doneTex[style.key_+':'+x.id];const now=!mystery&&x.ok(c);return `<div class="ch ${d?'done':''} ${now?'now':''}"><b>${x.t}</b><span>${x.g}</span><span class="st">${d?'Fet ★':'+1 ★'}</span></div>`;}).join('')}</div>`;
+    <div class="chal">${texList().map(x=>{const d=doneTex[style.key_+':'+x.id];const now=!mystery&&x.ok(c);return `<div class="ch ${d?'done':''} ${now?'now':''}"><b>${x.t}</b><span>${x.g}</span><span class="st">${d?'Fet ★':'+1 ★'}</span></div>`;}).join('')}</div>`;
   }else if(sub==='esc'){
     const fb=listen.fb?`<div class="fb ${listen.fb.ok?'ok':'bad'}"><b>${listen.fb.msg}</b>${listen.fb.items?'<ul>'+listen.fb.items.map(i=>`<li>${i}</li>`).join('')+'</ul>':''}</div>`:'';
     const hint=listen.showHint&&listen.target?`<p class="hint">Pista: hi ha ${listen.target.map(s=>LAYERS[s.layer].name).join(', ')}.</p>`:'';
@@ -1470,8 +1509,8 @@ function renderSide(){
     const q=quiz.answer;
     let res='';
     if(quiz.picked){const st=STYLES[q];const right=quiz.picked===q;
-      res=`<div class="fb ${right?'ok':'bad'}"><b>${right?'Correcte!':'No és '+STYLES[quiz.picked].name+'. Era '+st.name+'.'}</b><ul>${st.features.map(f=>`<li>${f}</li>`).join('')}</ul></div>`;}
-    body=`<p class="muted">Sona una mescla d'un estil amagat. Fixa't en el tempo, el bombo i la caixa.</p>
+      res=`<div class="fb ${right?'ok':'bad'}"><b>${right?'Correcte!':'No és '+STYLES[quiz.picked].name+'. Era '+st.name+'.'}</b><ul>${(kid()?KID[q]:st.features).map(f=>`<li>${f}</li>`).join('')}</ul></div>`;}
+    body=`<p class="muted">Sona una mescla d'un estil amagat. ${kid()?"Escolta si va ràpid i com sonen els tambors.":"Fixa't en el tempo, el bombo i la caixa."}</p>
     <div class="row"><button class="btn primary" id="quizBtn">${q?'Una altra':'Comença'}</button></div>
     ${q?`<div class="opts">${Object.entries(STYLES).map(([k,st])=>`<button data-q="${k}" class="${quiz.picked?(k===q?'right':(k===quiz.picked?'wrong':'')):''}">${st.name}</button>`).join('')}</div>`:''}${res}`;
   }
@@ -1498,7 +1537,7 @@ function setStyle(k,keepHidden){
   style=STYLES[k];app.dataset.style=k;
   clearAll();
   Tone.Transport.bpm.value=style.bpm;Tone.Transport.swing=style.swing;Tone.Transport.swingSubdivision='16n';
-  inspect=null;const tp=$('tempo');tp.min=style.bpm-30;tp.max=style.bpm+30;tp.value=style.bpm;$('tempoOut').textContent=style.bpm+' BPM';$('tempoBox').hidden=!!keepHidden;
+  inspect=null;const tp=$('tempo');tp.min=style.bpm-30;tp.max=style.bpm+30;tp.value=style.bpm;$('tempoOut').textContent=tempoText(style.bpm);$('tempoBox').hidden=!!keepHidden;
   listen.target=null;listen.fb=null;
   renderStyles();renderMeta();afterChange();
 }
@@ -1542,8 +1581,8 @@ $('play').addEventListener('click',async()=>{
 });
 $('startBtn').addEventListener('click',()=>ensureAudio());
 $('tempo').addEventListener('input',e=>{const v=+e.target.value;Tone.Transport.bpm.value=v;
-  const d=v-style.bpm;$('tempoOut').textContent=v+' BPM';
-  $('mInfo').textContent=`${v} BPM · 4/4 · ${style.key}`+(d>=15?' · més energia':d<=-15?' · més tranquil':'');tour.check();});
+  const d=v-style.bpm;$('tempoOut').textContent=tempoText(v);
+  if(!kid())$('mInfo').textContent=`${v} BPM · 4/4 · ${style.key}`+(d>=15?' · més energia':d<=-15?' · més tranquil':'');tour.check();});
 document.addEventListener('keydown',e=>{
   if(e.target.closest('input,textarea,select')||e.metaKey||e.ctrlKey||e.altKey)return;
   if(e.key===' '&&!e.target.closest('button')){e.preventDefault();$('play').click();}
@@ -1828,13 +1867,13 @@ const TOUR=[
  {el:'#palette .prow:nth-child(4)',t:'Ara, la melodia',d:'La melodia és la part que es pot cantar o xiular.',todo:'Posa un so groc (Melodia).',ok:()=>fillC().melodia>=1},
  {el:'#side .card',t:'Què sona ara?',d:'Aquest panell t\'explica la textura. Amb una melodia i acompanyament de ritme i baix tens una «melodia acompanyada».'},
  {el:'#palette .prow:nth-child(3)',t:'Afegeix acords',d:'L\'harmonia són diverses notes que sonen alhora: els acords.',todo:'Posa un so blau (Harmonia).',ok:()=>fillC().harmonia>=1},
- {el:'#slots',t:'Silencia un músic',d:'Així sents com canvia la música quan falta una capa.',todo:'Toca un personatge o prem el seu botó M.',ok:()=>slots.some(s=>s.sound&&s.muted)},
- {el:'#slots',t:'Escolta\'n només un',d:'El botó S (solo) fa callar tots els altres. Torna\'l a prémer per sentir-los de nou.',todo:'Prem S en un personatge.',ok:()=>slots.some(s=>s.sound&&s.solo)},
- {el:'#slots',t:'Mira què toca',d:'Veuràs el seu ritme en caselles. Cada casella és una semicorxera.',todo:'Prem el botó i d\'un personatge.',ok:()=>inspect!=null},
- {el:'#prog',t:'Els acords i el compàs',d:'Els acords canvien a cada compàs. Els punts que s\'encenen són els 4 temps del compàs.'},
- {el:'#tempoBox',t:'Canvia el tempo',d:'Més BPM vol dir més ràpid i amb més energia. Menys BPM, més tranquil.',todo:'Mou el control de tempo.',ok:()=>Math.abs(Tone.Transport.bpm.value-style.bpm)>=5},
+ {el:'#slots',t:'Fes callar un músic',d:'Així sents com canvia la música quan en falta un.',todo:'Toca un personatge.',ok:()=>slots.some(s=>s.sound&&s.muted)},
+ {el:'#slots',t:'Escolta\'n només un',d:'Un botó fa callar tots els altres (diu «Sol» o «S»). Torna\'l a prémer per sentir-los de nou.',todo:'Prem-lo en un personatge.',ok:()=>slots.some(s=>s.sound&&s.solo)},
+ {adv:true,el:'#slots',t:'Mira què toca',d:'Veuràs el seu ritme en caselles. Cada casella és una semicorxera.',todo:'Prem el botó i d\'un personatge.',ok:()=>inspect!=null},
+ {adv:true,el:'#prog',t:'Els acords i el compàs',d:'Els acords canvien a cada compàs. Els punts que s\'encenen són els 4 temps del compàs.'},
+ {el:'#tempoBox',t:'Canvia el tempo',d:'Més ràpid té més energia. Més lent és més tranquil.',todo:'Mou el control de tempo.',ok:()=>Math.abs(Tone.Transport.bpm.value-style.bpm)>=5},
  {el:'#styles',t:'Canvia d\'estil',d:'Cada estil té els seus sons, el seu tempo i els seus acords.',todo:'Tria un altre estil.',enter:()=>{tourStyle0=style.key_;},ok:()=>style.key_!==tourStyle0},
- {el:'#formBox',t:'La forma musical',d:'Desa la mescla com a secció A, crea\'n una altra per a la B i encadena-les: A-B-A, A-B-C o A-A-A.'},
+ {adv:true,el:'#formBox',t:'La forma musical',d:'Desa la mescla com a secció A, crea\'n una altra per a la B i encadena-les: A-B-A, A-B-C o A-A-A.'},
  {el:'.actions',t:'Grava i entrega',d:'Amb «Grava» enregistres la teva mescla. Amb «Codi de la mescla» obtens un codi curt per entregar-la al professor.'},
  {el:'#modeRep',t:'Els reptes',d:'Hi trobaràs reptes de textura, d\'escolta i d\'estils per guanyar estrelles.',todo:'Prem «Reptes».',ok:()=>mode==='rep'},
  {t:'Ja ets de la colla!',d:'Ja saps fer servir BeatColla. Ara, a crear i a superar reptes!',btn:'Acaba',last:true}
@@ -1847,14 +1886,14 @@ const tour={i:-1,spot:null,card:null,timer:null,passing:false,
     clearAll();inspect=null;afterChange();ensureAudio();
     if(!this.spot){this.spot=document.createElement('div');this.spot.className='tour-spot';this.card=document.createElement('div');this.card.className='tour-card';this.card.setAttribute('role','dialog');this.card.setAttribute('aria-live','polite');document.body.append(this.spot,this.card);
       this.card.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.t==='next')this.next();else if(b.dataset.t==='skip')this.end(false);});}
-    this.spot.hidden=false;this.card.hidden=false;this.i=0;this.show();
+    this.list=TOUR.filter(x=>!(kid()&&x.adv));this.spot.hidden=false;this.card.hidden=false;this.i=0;this.show();
     clearInterval(this.timer);this.timer=setInterval(()=>this.place(),250);
   },
   show(){
-    const st=TOUR[this.i];this.passing=false;if(st.enter)st.enter();
+    const st=this.list[this.i];this.passing=false;if(st.enter)st.enter();
     if(st.el==='#side .card'&&mode!=='crea')setMode('crea');
-    const dots=TOUR.map((_,k)=>`<i class="${k<=this.i?'on':''}"></i>`).join('');
-    this.card.innerHTML=`<div class="row" style="justify-content:space-between"><span class="eyebrow">Tutorial · ${this.i+1} de ${TOUR.length}</span><div class="tour-dots">${dots}</div></div>
+    const dots=this.list.map((_,k)=>`<i class="${k<=this.i?'on':''}"></i>`).join('');
+    this.card.innerHTML=`<div class="row" style="justify-content:space-between"><span class="eyebrow">Tutorial · ${this.i+1} de ${this.list.length}</span><div class="tour-dots">${dots}</div></div>
       <h3>${st.t}</h3>${st.d?`<p>${st.d}</p>`:''}${st.todo?`<p class="todo" id="tourTodo">→ ${st.todo}</p>`:''}
       <div class="row" style="justify-content:flex-end">${st.last?'':'<button class="btn" data-t="skip">Surt del tutorial</button>'}${st.ok?'':`<button class="btn primary" data-t="next">${st.btn||'Següent'}</button>`}</div>`;
     const el=st.el&&document.querySelector(st.el);
@@ -1862,23 +1901,34 @@ const tour={i:-1,spot:null,card:null,timer:null,passing:false,
     this.place();this.check();
   },
   place(){
-    if(this.i<0)return;const st=TOUR[this.i];const el=st.el&&document.querySelector(st.el);
+    if(this.i<0)return;const st=this.list[this.i];const el=st.el&&document.querySelector(st.el);
     if(!el){this.spot.classList.add('none');this.spot.style.left='50%';this.spot.style.top='50%';this.card.className='tour-card bottom';this.card.style.top='';this.card.style.bottom='';return;}
     const r=el.getBoundingClientRect(),p=6;this.spot.classList.remove('none');
     Object.assign(this.spot.style,{left:(r.left-p)+'px',top:(r.top-p)+'px',width:(r.width+p*2)+'px',height:(r.height+p*2)+'px'});
     this.card.className='tour-card '+((r.top+r.height/2)>innerHeight/2?'top':'bottom');
   },
   check(){
-    if(this.i<0||this.passing)return;const st=TOUR[this.i];
+    if(this.i<0||this.passing)return;const st=this.list[this.i];
     if(st&&st.ok&&st.ok()){this.passing=true;const td=document.getElementById('tourTodo');if(td){td.className='done';td.textContent='✓ Molt bé!';}setTimeout(()=>this.next(),reduce?300:950);}
   },
-  next(){if(this.i<0)return;if(TOUR[this.i].last){this.end(true);return;}this.i++;this.show();},
+  next(){if(this.i<0)return;if(this.list[this.i].last){this.end(true);return;}this.i++;this.show();},
   end(done){
     this.i=-1;clearInterval(this.timer);this.spot.hidden=true;this.card.hidden=true;
     if(done){let first=true;try{first=!localStorage.getItem('beatcolla.tour');localStorage.setItem('beatcolla.tour','1');}catch(e){}if(first)addStars(3);}
   }
 };
 $('tourBtn').addEventListener('click',()=>tour.start());
+function paintLevel(){app.dataset.nivell=lvl;document.querySelectorAll('[data-nivell]').forEach(b=>{if(b.tagName==='BUTTON')b.setAttribute('aria-pressed',b.dataset.nivell===lvl);});}
+function setLevel(v){
+  if(v===lvl)return;
+  if(tour.i>=0)tour.end(false);
+  lvl=v;try{localStorage.setItem('beatcolla.nivell',v);}catch(e){}
+  inspect=null;listen.level=kid()?2:3;listen.target=null;listen.fb=null;
+  paintLevel();renderStyles();renderMeta();renderSlots();
+  const t=Tone.Transport.bpm.value;$('tempoOut').textContent=tempoText(Math.round(t));afterChange();
+}
+document.querySelectorAll('.lvlseg').forEach(g=>g.addEventListener('click',e=>{const b=e.target.closest('button');if(b)setLevel(b.dataset.nivell);}));
+listen.level=kid()?2:3;paintLevel();renderStyles();renderMeta();renderSlots();$('tempoOut').textContent=tempoText(style.bpm);renderPalette();renderSide();
 
 /* ---------- Landing ---------- */
 function enterApp(how,styleKey){

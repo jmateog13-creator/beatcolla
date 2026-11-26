@@ -575,6 +575,14 @@ header.top::before{content:""; position:absolute; left:0; right:0; top:0; height
 .wrap[data-nivell="p"] .slot-ctl button{height:32px; font-family:var(--f-body); font-weight:700; font-size:11.5px}
 .wrap[data-nivell="p"] .shortcuts{display:none}
 .phead small{display:block; font-size:11.5px; color:var(--muted); line-height:1.2}
+
+/* Cara del personatge a cada so de la paleta */
+.chip .g.av, .wrap[data-nivell="p"] .chip .g.av{width:40px; height:40px; border-radius:10px; background:color-mix(in srgb, var(--c) 22%, var(--surface)); overflow:hidden}
+.chip .g.av .char{width:100%; height:100%}
+.chip .g.av .eyes{animation:none}
+.chip, .wrap[data-nivell="p"] .chip{padding:5px 4px; flex-direction:column; justify-content:flex-start; gap:3px; text-align:center}
+.chip .t, .wrap[data-nivell="p"] .chip .t{font-size:12px; overflow-wrap:break-word; hyphens:manual}
+@media (max-width:720px){ .chip .g.av, .wrap[data-nivell="p"] .chip .g.av{width:32px; height:32px} }
 </style>
 
 <div class="landing" id="landing" data-style="hh">
@@ -1134,105 +1142,171 @@ const ICONS={
   efectes:'<path d="M12 3l2 6.5 6.5 2.5-6.5 2.5L12 21l-2-6.5L3.5 12 10 9.5z"/>'
 };
 const icon=l=>`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[l]}</svg>`;
-const SKIN={ritme:'#7B4A2B',baix:'#C98D5E',harmonia:'#F1C8A0',melodia:'#A5673F',efectes:'#C3CDE2'};
-const HAIR={ritme:'#1D1626',baix:'#3A271B',harmonia:'#7A4522',melodia:'#24160F'};
+const SKINS=['#7B4A2B','#C98D5E','#F1C8A0','#A5673F','#E5AD80'];
+/* Instrument que toca cada personatge, segons el so */
+function propOf(layer,snd){
+  if(!snd)return {ritme:'sticks',baix:'bass',harmonia:'keys',melodia:'mic'}[layer]||'none';
+  if(snd.kind==='drums'){const v=snd.tracks.map(t=>t[0]);
+    if(v.includes('bkick'))return 'mic';
+    if(v.includes('conga'))return 'bongos';
+    if(v.includes('shaker')||v.includes('tamb'))return 'maracas';
+    if(v.every(x=>x==='clap'))return 'clap';
+    if(v.every(x=>x==='hat'||x==='ohat'))return 'cymbal';
+    return 'sticks';}
+  if(snd.kind==='fx')return {scratch:'vinyl',crackle:'vinyl',vox:'mic',horn:'megaphone',siren:'siren',zap:'laser',impact:'mallet',riser:'rocket',reverse:'cymbal'}[snd.fx]||'none';
+  const y=snd.synth;
+  if(layer==='baix')return snd.name==='Contrabaix'?'upright':(y==='pluckb'?'bass':'speaker');
+  if(layer==='harmonia')return {guitar:'guitar',choir:'sheet',organ:'accordion'}[y]||'keys';
+  return {flute:'flute',bell:'xylo',marimba:'xylo',whistle:'whistle',brass:'trumpet',pluck:'guitar',pluckg:'guitar',vocal:'mic'}[y]||'keytar';
+}
 let charSeq=0;
-function charSVG(layer,myst){
-  const id='bc'+(myst?'m':layer)+(++charSeq);
-  const c=myst?'#6C6F88':LHEX[layer], sk=myst?'#7E8199':SKIN[layer];
-  const S=`stroke="${OUT}" stroke-width="2.4" stroke-linejoin="round"`;
+function charSVG(layer,myst,snd,faceOnly){
+  const v=snd?snd.idx%4:0;
+  const id='bc'+(++charSeq);
+  const c=myst?'#6C6F88':LHEX[layer];
+  const lskin={ritme:[0,1,2,3],baix:[1,3,4,0],harmonia:[2,0,1,4],melodia:[3,2,0,1]};
+  const robotSk=['#C3CDE2','#8EE0A8','#7FD7B6','#EAF2FF'];
+  const sk=myst?'#7E8199':layer==='efectes'?robotSk[v]:SKINS[lskin[layer][v]];
+  const S=`stroke="${OUT}" stroke-width="2.4" stroke-linejoin="round"`, S2=`stroke="${OUT}" stroke-width="1.8" stroke-linejoin="round"`;
   const defs=`<defs><linearGradient id="${id}c" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${lt(c,.3)}"/><stop offset=".55" stop-color="${c}"/><stop offset="1" stop-color="${dk(c,.3)}"/></linearGradient>
     <radialGradient id="${id}s" cx=".36" cy=".3" r=".85"><stop offset="0" stop-color="${lt(sk,.25)}"/><stop offset=".6" stop-color="${sk}"/><stop offset="1" stop-color="${dk(sk,.25)}"/></radialGradient></defs>`;
-  const cloth=`url(#${id}c)`, skin=`url(#${id}s)`;
-  const robot=layer==='efectes'&&!myst;
-  const pants=robot?dk(sk,.25):'#2A2442';
-  const legs=`<path d="M55 160h13v40h-13z" fill="${pants}" ${S}/><path d="M72 160h13v40h-13z" fill="${pants}" ${S}/>
+  const cloth=`url(#${id}c)`, skin=`url(#${id}s)`, dark=dk(c,.32);
+  const legCol=layer==='efectes'?dk(sk,.3):['#2A2442','#33466E','#4A3A5C','#25303F'][v];
+  const legs=`<path d="M55 160h13v40h-13z" fill="${legCol}" ${S}/><path d="M72 160h13v40h-13z" fill="${legCol}" ${S}/>
     <path d="M42 206c0-8 6-12 14-12h7c4 0 6 3 6 7v5z" fill="#F4F2FA" ${S}/><path d="M71 206v-5c0-4 2-7 6-7h7c8 0 14 4 14 12z" fill="#F4F2FA" ${S}/>
     <path d="M48 200h12M80 200h12" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`;
+  /* Roba: quatre variants */
+  const extra=['',
+    `<path d="M39 130h62M39 142h62" stroke="#fff" stroke-opacity=".45" stroke-width="5"/>`,
+    `<path d="M52 98v68M88 98v68" stroke="${dark}" stroke-width="7"/><circle cx="52" cy="122" r="2.5" fill="#fff"/><circle cx="88" cy="122" r="2.5" fill="#fff"/>`,
+    `<path d="M70 106v60" stroke="${OUT}" stroke-width="2"/><path d="M58 100l12 8-12 7zM82 100l-12 8 12 7z" fill="#fff" ${S2}/>`][v];
   const torso=`<path d="M38 114c0-12 9-18 20-18h24c11 0 20 6 20 18v44c0 6-4 10-10 10H48c-6 0-10-4-10-10z" fill="${cloth}" ${S}/>
-    <path d="M45 117c3-5 8-7 13-7" stroke="#fff" stroke-opacity=".4" stroke-width="3" fill="none" stroke-linecap="round"/>
-    <path d="M62 97l8 9 8-9" fill="none" stroke="${dk(c,.35)}" stroke-width="2.4" stroke-linejoin="round"/>`;
-  const emblem=myst?`<circle cx="70" cy="138" r="11" fill="#fff" ${S} stroke-width="2"/><text x="70" y="144" class="glyph" fill="${OUT}">?</text>`
-    :`<circle cx="70" cy="138" r="11" fill="#fff" ${S} stroke-width="2"/><g transform="translate(61.6 129.6) scale(.7)" fill="none" stroke="${c}" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[layer]}</g>`;
-  const arm=(cls,d,hx,hy,before='',after='')=>`<g class="${cls}"><path d="${d}" stroke="${OUT}" stroke-width="16.5" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${c}" stroke-width="11.5" fill="none" stroke-linecap="round"/><path d="${d}" stroke="#fff" stroke-opacity=".18" stroke-width="4" fill="none" stroke-linecap="round"/>${before}<circle cx="${hx}" cy="${hy}" r="7" fill="${skin}" ${S}/>${after}</g>`;
-  const neck=`<path d="M63 88h14v12H63z" fill="${dk(sk,.18)}" ${S} stroke-width="1.6"/>`;
-  const ears=`<circle cx="37" cy="66" r="7" fill="${skin}" ${S}/><circle cx="103" cy="66" r="7" fill="${skin}" ${S}/>`;
-  const skull=`<circle cx="70" cy="62" r="33" fill="${skin}" ${S}/>`;
-  const eyes=`<g class="eyes"><ellipse cx="58" cy="64" rx="6.5" ry="7.5" fill="#fff" ${S} stroke-width="1.6"/><ellipse cx="82" cy="64" rx="6.5" ry="7.5" fill="#fff" ${S} stroke-width="1.6"/><circle cx="59" cy="65.5" r="3.7" fill="#231B3A"/><circle cx="83" cy="65.5" r="3.7" fill="#231B3A"/><circle cx="60.4" cy="63.8" r="1.3" fill="#fff"/><circle cx="84.4" cy="63.8" r="1.3" fill="#fff"/></g>`;
-  const face=eyes+`<path d="M51 54q7-5 14-1M75 53q7-4 14 1" stroke="${OUT}" stroke-width="2.8" fill="none" stroke-linecap="round"/>
-    <path d="M70 69q3.5 4-1 6.5" stroke="${dk(sk,.35)}" stroke-width="2" fill="none" stroke-linecap="round"/>
-    <ellipse cx="49" cy="77" rx="6" ry="3.4" fill="#FF6F86" opacity=".3"/><ellipse cx="91" cy="77" rx="6" ry="3.4" fill="#FF6F86" opacity=".3"/>
-    <ellipse cx="70" cy="83" rx="7" ry="2" class="mouth" fill="#3A1426" ${S} stroke-width="1.6"/>`;
-  const stick=(x1,y1,x2,y2)=>`<path d="M${x1} ${y1}L${x2} ${y2}" stroke="${OUT}" stroke-width="6" stroke-linecap="round"/><path d="M${x1} ${y1}L${x2} ${y2}" stroke="#EBCB92" stroke-width="3.2" stroke-linecap="round"/><circle cx="${x2}" cy="${y2}" r="3" fill="#EBCB92" ${S} stroke-width="1.4"/>`;
-  let back='',props='',armL,armR,headpart,calm=false;
-  if(myst){
-    armL=arm('arm-l','M42 112q-10 10-14 28',28,142);armR=arm('arm-r','M98 112q10 10 14 28',112,142);
-    headpart=neck+ears+skull+`<text x="70" y="76" class="q">?</text>`;
-  }else switch(layer){
-    case 'ritme':
-      armL=arm('arm-l','M42 112q-12 8-16 28',26,142,stick(26,142,8,114));
-      armR=arm('arm-r','M98 112q12 8 16 28',114,142,stick(114,142,132,114));
-      headpart=neck+ears+skull+`<path d="M38 60q0-8 4-12v14zM102 60q0-8-4-12v14z" fill="${HAIR.ritme}"/>`+face+
-        `<path d="M36 57c0-21 14-33 34-33s34 12 34 33c-20-7-48-7-68 0z" fill="${cloth}" ${S}/>
-         <path d="M37 56c-9-1-18 2-21 8 8 3 17 1 23-3z" fill="${dk(c,.32)}" ${S}/>
-         <circle cx="70" cy="26" r="3.6" fill="${dk(c,.32)}" ${S} stroke-width="1.6"/>
-         <path d="M48 49q22-7 44 0" stroke="#fff" stroke-opacity=".45" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
-      break;
-    case 'baix':
-      calm=true;
-      props=`<g transform="rotate(-24 60 150)"><path d="M43 150c0-9 6-14 14-14 5 0 7 3 11 3s6-3 10-3c7 0 11 6 11 12 0 9-8 16-23 16-15 0-23-6-23-14z" fill="#F3E9D2" ${S}/>
-        <path d="M52 151c4-3 10-3 14 0" stroke="${dk(c,.15)}" stroke-width="5" fill="none" stroke-linecap="round"/>
-        <rect x="88" y="146" width="44" height="6" rx="2" fill="#9A6332" ${S} stroke-width="1.8"/><rect x="130" y="143" width="12" height="12" rx="3" fill="${OUT}"/>
-        <path d="M58 147.5h74M58 150.5h74" stroke="#E6E3EE" stroke-width=".9"/></g>`;
-      armL=arm('arm-l','M42 114q-8 18 14 30',56,144);
-      armR=arm('arm-r','M98 114q10 2 12 13',110,127);
-      headpart=neck+ears+skull+`<path d="M38 56c0-22 14-32 32-32s32 10 32 32c-8-8-20-11-32-11s-24 3-32 11z" fill="${HAIR.baix}" ${S}/>`+face+
-        `<path d="M33 64c0-30 16-46 37-46s37 16 37 46" stroke="${OUT}" stroke-width="9" fill="none" stroke-linecap="round"/>
-         <path d="M33 64c0-30 16-46 37-46s37 16 37 46" stroke="#3B3456" stroke-width="5" fill="none" stroke-linecap="round"/>
-         <rect x="24" y="52" width="17" height="27" rx="7" fill="${cloth}" ${S}/><rect x="99" y="52" width="17" height="27" rx="7" fill="${cloth}" ${S}/>
-         <path d="M28 58v14M112 58v14" stroke="#fff" stroke-opacity=".35" stroke-width="2.4" stroke-linecap="round"/>`;
-      break;
-    case 'harmonia':
-      calm=true;
-      props=`<rect x="22" y="140" width="96" height="21" rx="5" fill="#25203A" ${S}/><rect x="28" y="146" width="84" height="11" rx="2" fill="#fff"/>
-        <path d="M38.5 146v11M49 146v11M59.5 146v11M70 146v11M80.5 146v11M91 146v11M101.5 146v11" stroke="#B9B4CC" stroke-width="1"/>
-        <path d="M34 146v6.5M44 146v6.5M65 146v6.5M75 146v6.5M86 146v6.5M96 146v6.5" stroke="#25203A" stroke-width="3.6"/>
-        <circle cx="28" cy="143" r="1.6" fill="${lt(c,.2)}"/><circle cx="33" cy="143" r="1.6" fill="#F2C14E"/><circle cx="38" cy="143" r="1.6" fill="#E5484D"/>`;
-      armL=arm('arm-l','M42 114q-8 16 2 32',44,148);
-      armR=arm('arm-r','M98 114q8 16-2 32',96,148);
-      headpart=neck+ears+skull+`<path d="M41 58c4-6 10-8 16-6 4-4 12-5 18-2 6-3 14-2 18 3" fill="none" stroke="${HAIR.harmonia}" stroke-width="7" stroke-linecap="round"/>`+face+
-        `<g fill="#fff" fill-opacity=".14" stroke="${OUT}" stroke-width="2.4"><circle cx="58" cy="65" r="10"/><circle cx="82" cy="65" r="10"/></g>
-         <path d="M68 64q2-2 4 0M48 63l-10-3M92 63l10-3" stroke="${OUT}" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-         <path d="M37 54c0-22 15-34 33-34s33 12 33 34z" fill="${cloth}" ${S}/>
-         <rect x="34" y="47" width="72" height="12" rx="6" fill="${dk(c,.22)}" ${S}/>
-         <path d="M44 50v6M52 50v6M60 50v6M68 50v6M76 50v6M84 50v6M92 50v6" stroke="${OUT}" stroke-opacity=".25" stroke-width="1.6"/>
-         <circle cx="70" cy="18" r="7.5" fill="#fff" ${S}/>`;
-      break;
-    case 'melodia':
-      back=`<g fill="${HAIR.melodia}" ${S}><circle cx="40" cy="60" r="14"/><circle cx="43" cy="40" r="15"/><circle cx="57" cy="27" r="16"/><circle cx="83" cy="27" r="16"/><circle cx="97" cy="40" r="15"/><circle cx="100" cy="60" r="14"/><circle cx="70" cy="22" r="15"/></g>`;
-      armL=arm('arm-l','M42 112q-14 2-18-16',24,96);
-      armR=arm('arm-r','M98 112q16 0 10-24',108,88,`<path d="M108 90l2 18" stroke="${OUT}" stroke-width="7" stroke-linecap="round"/><path d="M108 90l2 18" stroke="#4A4560" stroke-width="4" stroke-linecap="round"/>`,
-        `<circle cx="105" cy="79" r="7.5" fill="#C9CCD8" ${S}/><path d="M99.5 77h11M99 81h12" stroke="#8D90A3" stroke-width="1.2"/>`);
-      headpart=neck+ears+`<circle cx="37" cy="76" r="4.5" fill="none" stroke="#F2C14E" stroke-width="2.2"/><circle cx="103" cy="76" r="4.5" fill="none" stroke="#F2C14E" stroke-width="2.2"/>`+skull+
-        `<path d="M42 47c6-10 18-15 28-13 10-2 22 3 28 13-6-3-12-3-17 0-4-4-17-4-22 0-5-3-11-3-17 0z" fill="${HAIR.melodia}"/>`+face;
-      break;
-    case 'efectes':{
-      props=`<rect x="52" y="122" width="36" height="30" rx="6" fill="#1D1934" ${S} stroke-width="2"/><circle cx="61" cy="132" r="3" fill="${lt(c,.3)}"/><circle cx="70" cy="132" r="3" fill="#F2C14E"/><circle cx="79" cy="132" r="3" fill="#E5484D"/><path d="M58 144h24" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`;
-      const vinyl=`<circle cx="20" cy="146" r="13" fill="#141126" ${S}/><circle cx="20" cy="146" r="8.5" fill="none" stroke="#3A3456" stroke-width="1"/><circle cx="20" cy="146" r="4" fill="${c}"/>`;
-      armL=arm('arm-l','M42 112q-12 8-14 26',28,140,vinyl);
-      armR=arm('arm-r','M98 112q12 8 14 26',112,140);
-      headpart=`<path d="M70 28V13" stroke="${OUT}" stroke-width="3"/><circle cx="70" cy="10" r="11" class="glow"/><circle cx="70" cy="10" r="5.5" fill="${lt(c,.2)}" ${S} stroke-width="2"/>`+neck+
-        `<rect x="27" y="50" width="10" height="22" rx="3" fill="${dk(sk,.22)}" ${S}/><rect x="103" y="50" width="10" height="22" rx="3" fill="${dk(sk,.22)}" ${S}/>
-         <rect x="34" y="28" width="72" height="64" rx="20" fill="${skin}" ${S}/>
-         <path d="M42 36q14-5 28-5" stroke="#fff" stroke-opacity=".55" stroke-width="3" fill="none" stroke-linecap="round"/>
-         <rect x="42" y="48" width="56" height="26" rx="13" fill="#141126" ${S}/>
-         <g class="eyes"><rect x="52" y="56" width="12" height="10" rx="5" fill="${lt(c,.35)}"/><rect x="76" y="56" width="12" height="10" rx="5" fill="${lt(c,.35)}"/></g>
-         <rect x="47" y="51" width="22" height="4" rx="2" fill="#fff" opacity=".2"/>
-         <ellipse cx="70" cy="83" rx="9" ry="2" class="mouth" fill="${lt(c,.25)}" ${S} stroke-width="1.6"/>`;
-      break;}
+    <path d="M45 117c3-5 8-7 13-7" stroke="#fff" stroke-opacity=".4" stroke-width="3" fill="none" stroke-linecap="round"/>${myst?'':extra}`;
+  const emblem=`<circle cx="70" cy="132" r="10" fill="#fff" ${S2}/>`+(myst?`<text x="70" y="138" class="glyph" fill="${OUT}">?</text>`
+    :`<g transform="translate(62.4 124.4) scale(.63)" fill="none" stroke="${c}" stroke-width="2.9" stroke-linecap="round" stroke-linejoin="round">${ICONS[layer]}</g>`);
+  const arm=(cls,d,hx,hy,before='',after='')=>`<g class="${cls}"><path d="${d}" stroke="${OUT}" stroke-width="16.5" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${c}" stroke-width="11.5" fill="none" stroke-linecap="round"/>${before}<circle cx="${hx}" cy="${hy}" r="7" fill="${skin}" ${S}/>${after}</g>`;
+  const line=(d,w,col)=>`<path d="${d}" stroke="${OUT}" stroke-width="${w+3}" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${col}" stroke-width="${w}" fill="none" stroke-linecap="round"/>`;
+  /* Instruments */
+  let props='',armL,armR,calm=false;
+  const A={down:()=>arm('arm-l','M42 112q-10 10-14 28',28,142),down2:()=>arm('arm-r','M98 112q10 10 14 28',112,142)};
+  const prop=myst?'none':propOf(layer,snd);
+  const mic=`${line('M108 90l2 18',4,'#4A4560')}`, micTop=`<circle cx="105" cy="79" r="7.5" fill="#C9CCD8" ${S}/>`;
+  switch(prop){
+    case 'sticks':armL=arm('arm-l','M42 112q-12 8-16 28',26,142,line('M26 142L8 114',3,'#EBCB92'));armR=arm('arm-r','M98 112q12 8 16 28',114,142,line('M114 142l18-28',3,'#EBCB92'));break;
+    case 'cymbal':armL=arm('arm-l','M42 112q-12 8-16 28',26,142,line('M26 142L10 120',3,'#EBCB92'));armR=arm('arm-r','M98 112q14 2 14 14',112,128);
+      props=`${line('M122 150v52',3,'#9AA0B5')}<ellipse cx="120" cy="148" rx="19" ry="5" fill="#F2C14E" ${S}/>`;break;
+    case 'bongos':calm=true;props=`<rect x="36" y="146" width="32" height="30" rx="6" fill="#B5703C" ${S}/><rect x="70" y="142" width="36" height="36" rx="6" fill="#9A5A2C" ${S}/><ellipse cx="52" cy="147" rx="16" ry="5" fill="#F3E3C3" ${S2}/><ellipse cx="88" cy="143" rx="18" ry="5.5" fill="#F3E3C3" ${S2}/>`;
+      armL=arm('arm-l','M42 114q-8 14 8 28',51,142);armR=arm('arm-r','M98 114q8 12-8 24',89,138);break;
+    case 'maracas':{const m=(x,y)=>`${line(`M${x} ${y}v-14`,3,'#EBCB92')}<ellipse cx="${x}" cy="${y-24}" rx="9" ry="12" fill="#F2C14E" ${S}/><path d="M${x-8} ${y-25}h16" stroke="${c}" stroke-width="3"/>`;
+      armL=arm('arm-l','M42 112q-16 4-18-14',24,98,m(24,98));armR=arm('arm-r','M98 112q16 4 18-14',116,98,m(116,98));break;}
+    case 'clap':calm=true;armL=arm('arm-l','M42 114q-6 24 20 18',63,131);armR=arm('arm-r','M98 114q6 24-20 18',77,131);
+      props='';break;
+    case 'mic':armL=arm('arm-l','M42 112q-14 2-18-16',24,96);armR=arm('arm-r','M98 112q16 0 10-24',108,88,mic,micTop);break;
+    case 'whistle':armL=A.down();armR=arm('arm-r','M98 112q14-4 -2-22',90,90);break;
+    case 'bass':case 'guitar':{calm=true;const acoustic=prop==='guitar';
+      props=`<g transform="rotate(-24 60 150)">${acoustic?`<path d="M40 150c0-10 7-16 15-16 6 0 8 5 12 5s5-4 9-4c7 0 11 7 11 15s-5 16-12 16c-5 0-6-4-9-4s-6 6-13 6c-8 0-13-8-13-18z" fill="#C98B45" ${S}/><circle cx="66" cy="151" r="6" fill="${OUT}"/>`
+        :`<path d="M43 150c0-9 6-14 14-14 5 0 7 3 11 3s6-3 10-3c7 0 11 6 11 12 0 9-8 16-23 16-15 0-23-6-23-14z" fill="#F3E9D2" ${S}/><path d="M52 151c4-3 10-3 14 0" stroke="${dk(c,.15)}" stroke-width="5" fill="none"/>`}
+        <rect x="86" y="146" width="46" height="6" rx="2" fill="#7A4A26" ${S2}/><rect x="130" y="143" width="12" height="12" rx="3" fill="${OUT}"/><path d="M58 149h74" stroke="#E6E3EE" stroke-width="1"/></g>`;
+      armL=arm('arm-l','M42 114q-8 18 14 30',56,144);armR=arm('arm-r','M98 114q10 2 12 13',110,127);break;}
+    case 'upright':calm=true;props=`<g transform="translate(14 0)"><rect x="97" y="62" width="7" height="86" fill="#6E3F1E" ${S2}/><circle cx="100.5" cy="60" r="6" fill="#6E3F1E" ${S2}/><path d="M100 128c-14 0-20 8-18 18 1 6 6 8 3 14s-4 40 15 40 20-33 15-40 2-8 3-14c2-10-4-18-18-18z" fill="#A9642F" ${S}/><path d="M97 70v118M104 70v118" stroke="#F0E8DC" stroke-width=".9"/></g>`;
+      armL=A.down();armR=arm('arm-r','M98 112q14 0 14-14',112,98);break;
+    case 'speaker':calm=true;props=`<rect x="98" y="150" width="38" height="52" rx="6" fill="#221D3A" ${S}/><circle cx="117" cy="164" r="7" fill="#4A4468" ${S2}/><circle cx="117" cy="186" r="11" fill="#4A4468" ${S2}/><circle cx="117" cy="186" r="4" fill="${c}"/>`;
+      armL=A.down();armR=arm('arm-r','M98 112q18 8 18 34',117,148);break;
+    case 'keys':calm=true;props=`<rect x="22" y="140" width="96" height="21" rx="5" fill="#25203A" ${S}/><rect x="28" y="146" width="84" height="11" rx="2" fill="#fff"/><path d="M34 146v6.5M44 146v6.5M55 146v6.5M65 146v6.5M75 146v6.5M86 146v6.5M96 146v6.5M105 146v6.5" stroke="#25203A" stroke-width="3.6"/>`;
+      armL=arm('arm-l','M42 114q-8 16 2 32',44,148);armR=arm('arm-r','M98 114q8 16-2 32',96,148);break;
+    case 'keytar':calm=true;props=`<g transform="rotate(-18 70 146)"><rect x="34" y="136" width="62" height="20" rx="7" fill="#fff" ${S}/><rect x="94" y="141" width="34" height="9" rx="4" fill="${dark}" ${S2}/><path d="M42 143v13M50 143v13M58 143v13M66 143v13M74 143v13M82 143v13" stroke="${OUT}" stroke-width="2.6"/></g>`;
+      armL=arm('arm-l','M42 114q-8 18 8 34',50,148);armR=arm('arm-r','M98 114q12 4 10 18',108,134);break;
+    case 'accordion':calm=true;props=`<rect x="36" y="130" width="14" height="40" rx="4" fill="${dark}" ${S}/><rect x="90" y="130" width="14" height="40" rx="4" fill="${dark}" ${S}/><path d="M50 133l7 5 7-5 6 5 7-5 6 5 7-5v34l-7-5-6 5-7-5-6 5-7-5-7 5z" fill="#F4E7CF" ${S2}/><path d="M64 134v32M77 134v32" stroke="${c}" stroke-width="2"/>`;
+      armL=arm('arm-l','M42 114q-14 14-4 34',39,150);armR=arm('arm-r','M98 114q14 14 4 34',101,150);break;
+    case 'sheet':calm=true;props=`<path d="M45 138l25 6 25-6v30l-25 6-25-6z" fill="#fff" ${S}/><path d="M70 144v30M51 148l13 3M51 155l13 3M51 162l13 3M76 151l13-3M76 158l13-3M76 165l13-3" stroke="${OUT}" stroke-width="1.3"/>`;
+      armL=arm('arm-l','M42 114q-12 20 3 38',46,154);armR=arm('arm-r','M98 114q12 20-3 38',94,154);break;
+    case 'flute':calm=true;armL=arm('arm-l','M42 114q-4 8 12-8',56,102);armR=arm('arm-r','M98 114q16 4 12-16',108,94);break;
+    case 'trumpet':calm=true;armL=arm('arm-l','M42 114q0 6 28-8',72,104);armR=arm('arm-r','M98 114q16 0 6-18',103,96);break;
+    case 'xylo':calm=true;props=['#E5484D','#F2C14E','#1FA577','#2D8FD5','#7C5CE0','#C2479B'].map((k,i)=>`<rect x="${34+i*12.5}" y="${142+i*1.5}" width="10" height="${30-i*3}" rx="3" fill="${k}" ${S2}/>`).join('');
+      armL=arm('arm-l','M42 112q-18 6-8 20',35,132,line('M35 132l16 12',2.5,'#EBCB92'));armR=arm('arm-r','M98 112q18 6 8 20',105,132,line('M105 132l-16 12',2.5,'#EBCB92'));break;
+    case 'vinyl':armL=A.down();armR=arm('arm-r','M98 112q18 4 18 20',116,134,'',`<circle cx="118" cy="142" r="17" fill="#141126" ${S}/><circle cx="118" cy="142" r="11" fill="none" stroke="#4A4468" stroke-width="1.2"/><circle cx="118" cy="142" r="5" fill="#F2C14E"/>`);break;
+    case 'megaphone':armL=A.down();armR=arm('arm-r','M98 112q16 6 10-12',108,100,`<path d="M104 96l30-16v36l-30-12z" fill="#F4F2FA" ${S}/><ellipse cx="134" cy="98" rx="5" ry="18" fill="#E5484D" ${S2}/>`);break;
+    case 'siren':armL=arm('arm-l','M42 112q-14 2-18-14',24,98);armR=arm('arm-r','M98 112q18-2 18-22',116,90,'',`<path d="M105 86c0-18 22-18 22 0z" fill="#E5484D" ${S}/><rect x="102" y="85" width="28" height="7" rx="3" fill="#F4F2FA" ${S2}/><path d="M100 66l-6-6M116 60v-9M132 66l6-6" stroke="#FFC23D" stroke-width="3" stroke-linecap="round"/>`);break;
+    case 'laser':armL=A.down();armR=arm('arm-r','M98 112q14 8 14 14',112,128,`<path d="M106 118h24v12h-14l-3 10h-9z" fill="#D9DDE8" ${S}/><path d="M130 124h8" stroke="#FF5A60" stroke-width="4" stroke-linecap="round"/>`);break;
+    case 'mallet':armL=arm('arm-l','M42 112q-10 14-2 28',40,142);armR=arm('arm-r','M98 112q18 0 18-18',116,92,line('M116 96l4-32',4,'#EBCB92')+`<rect x="104" y="48" width="32" height="20" rx="8" fill="#B5703C" ${S}/>`);
+      props=`<ellipse cx="46" cy="164" rx="24" ry="22" fill="#F3E3C3" ${S}/><ellipse cx="46" cy="164" rx="14" ry="13" fill="none" stroke="${c}" stroke-width="3"/>`;break;
+    case 'rocket':armL=A.down();armR=arm('arm-r','M98 112q18 2 18-10',116,100,'',`<path d="M116 52c12 10 14 28 8 42h-16c-6-14-4-32 8-42z" fill="#F4F2FA" ${S}/><circle cx="116" cy="74" r="5" fill="#2D8FD5" ${S2}/><path d="M110 96l6 14 6-14z" fill="#FF7A3D" ${S2}/>`);break;
+    default:armL=A.down();armR=A.down2();
   }
-  const em=(layer==='efectes'&&!myst)?'':emblem;
-  return `<svg viewBox="0 0 140 220" class="char${calm?' calm':''}" aria-hidden="true">${defs}<ellipse class="glow" cx="70" cy="209" rx="54" ry="10"/><ellipse class="shadow" cx="70" cy="209" rx="40" ry="6"/><g class="fig">${back}${legs}${torso}${em}${props}${armL}${armR}<g class="head">${headpart}</g></g></svg>`;
+  /* Instruments que van davant de la boca */
+  let front='';
+  if(prop==='flute')front=line('M62 85L128 96',5,'#D9DDE8')+`<path d="M84 89h.1M96 91h.1M108 93h.1" stroke="${OUT}" stroke-width="3" stroke-linecap="round"/><circle cx="108" cy="94" r="6" fill="${skin}" ${S2}/>`;
+  if(prop==='trumpet')front=line('M74 86l36 8',5,'#F2C14E')+`<path d="M108 86l20-6v28l-20-8z" fill="#F2C14E" ${S}/>`;
+  if(prop==='whistle')front=`<rect x="73" y="80" width="18" height="10" rx="5" fill="#D9DDE8" ${S2}/><circle cx="90" cy="87" r="6" fill="#D9DDE8" ${S2}/><path d="M104 74q6-3 8-9M108 82q8 0 12-4" stroke="${lt(c,.3)}" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+
+  /* Cares */
+  const neck=`<path d="M63 88h14v12H63z" fill="${dk(sk,.18)}" ${S2}/>`;
+  const mouth=(col='#3A1426')=>`<ellipse cx="70" cy="83" rx="7" ry="2" class="mouth" fill="${col}" ${S2}/>`;
+  const eye=(x,y,rx,ry)=>`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="#fff" ${S2}/><circle cx="${x+1}" cy="${y+1.5}" r="${rx*.55}" fill="#231B3A"/><circle cx="${x+2.4}" cy="${y-.4}" r="${rx*.2}" fill="#fff"/>`;
+  let headpart,back='';
+  if(myst){
+    headpart=neck+`<circle cx="70" cy="62" r="33" fill="${skin}" ${S}/><text x="70" y="76" class="q">?</text>`;
+  }else if(layer==='efectes'){
+    const glow=`<circle cx="70" cy="10" r="11" class="glow"/><circle cx="70" cy="10" r="5.5" fill="${lt(c,.2)}" ${S2}/>`;
+    if(v===0)headpart=`<path d="M70 28V13" stroke="${OUT}" stroke-width="3"/>${glow}${neck}<rect x="27" y="50" width="10" height="22" rx="3" fill="${dk(sk,.22)}" ${S}/><rect x="103" y="50" width="10" height="22" rx="3" fill="${dk(sk,.22)}" ${S}/><rect x="34" y="28" width="72" height="64" rx="20" fill="${skin}" ${S}/>
+      <rect x="42" y="48" width="56" height="26" rx="13" fill="#141126" ${S}/><g class="eyes"><rect x="52" y="56" width="12" height="10" rx="5" fill="${lt(c,.35)}"/><rect x="76" y="56" width="12" height="10" rx="5" fill="${lt(c,.35)}"/></g>${mouth(lt(c,.25))}`;
+    else if(v===1)headpart=`<path d="M52 36Q40 18 34 14M88 36q12-18 18-22M70 30V12" stroke="${OUT}" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M52 36Q40 18 34 14M88 36q12-18 18-22M70 30V12" stroke="${sk}" stroke-width="2.6" fill="none"/>
+      <circle cx="34" cy="14" r="6" fill="${c}" ${S2}/><circle cx="106" cy="14" r="6" fill="${c}" ${S2}/>${glow}${neck}<path d="M70 28c26 0 40 15 40 32 0 20-22 36-40 36S30 80 30 60c0-17 14-32 40-32z" fill="${skin}" ${S}/>
+      <g class="eyes">${eye(70,48,9,10)}${eye(49,62,8,9)}${eye(91,62,8,9)}</g>${mouth()}`;
+    else if(v===2)headpart=`<path d="M42 38L30 10l28 18zM98 38l12-28-28 18z" fill="#F4E7CF" ${S}/>${neck}
+      <path d="M70 24l10 8 12-3 3 12 12 5-5 11 8 10-10 7 1 13-13 1-6 12-12-5-12 5-6-12-13-1 1-13-10-7 8-10-5-11 12-5 3-12 12 3z" fill="${cloth}" ${S}/>
+      <g class="eyes">${eye(57,56,11,12)}${eye(86,58,8,9)}</g><path d="M48 40l18 4M94 46l-14 2" stroke="${OUT}" stroke-width="3.5" stroke-linecap="round"/><ellipse cx="70" cy="83" rx="11" ry="3" class="mouth" fill="#3A1426" ${S2}/><path d="M62 80l4 6 3-6M73 80l3 6 4-6" fill="#fff"/>`;
+    else headpart=`${neck}<circle cx="70" cy="60" r="40" fill="#EAF2FF" ${S}/><circle cx="70" cy="62" r="30" fill="#1D2350" ${S}/><path d="M50 46q9-10 22-9" stroke="#fff" stroke-width="4" opacity=".55" fill="none" stroke-linecap="round"/>
+      <g class="eyes"><path d="M52 64q7-10 14 0M74 64q7-10 14 0" stroke="${lt(c,.45)}" stroke-width="5" fill="none" stroke-linecap="round"/></g>${mouth(lt(c,.35))}
+      <rect x="25" y="52" width="9" height="18" rx="3" fill="${c}" ${S2}/><rect x="106" y="52" width="9" height="18" rx="3" fill="${c}" ${S2}/><path d="M104 32l12-14" stroke="${OUT}" stroke-width="3"/><circle cx="118" cy="16" r="5" fill="${c}" ${S2}/>`;
+  }else{
+    const hair=['#1D1626','#3A271B','#7A4522','#24160F','#C9682E','#E3B34B'];
+    const H=hair[({ritme:0,baix:1,harmonia:2,melodia:3}[layer]+v*2)%6];
+    const ears=`<circle cx="37" cy="66" r="7" fill="${skin}" ${S}/><circle cx="103" cy="66" r="7" fill="${skin}" ${S}/>`;
+    const skull=`<circle cx="70" cy="62" r="33" fill="${skin}" ${S}/>`;
+    const face=`<g class="eyes">${eye(58,64,6.5,7.5)}${eye(82,64,6.5,7.5)}</g><path d="M51 54q7-5 14-1M75 53q7-4 14 1" stroke="${OUT}" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+      <path d="M70 69q3.5 4-1 6.5" stroke="${dk(sk,.35)}" stroke-width="2" fill="none" stroke-linecap="round"/><ellipse cx="49" cy="77" rx="6" ry="3.4" fill="#FF6F86" opacity=".3"/><ellipse cx="91" cy="77" rx="6" ry="3.4" fill="#FF6F86" opacity=".3"/>`+mouth();
+    const fringe=`<path d="M38 58c0-22 14-34 32-34s32 12 32 34c-8-10-18-14-24-12-8 8-26 6-40 12z" fill="${H}" ${S}/>`;
+    const bumps=pts=>`<g fill="${H}" ${S}>${pts.map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}"/>`).join('')}</g>`;
+    const cap=`<path d="M36 57c0-21 14-33 34-33s34 12 34 33c-20-7-48-7-68 0z" fill="${cloth}" ${S}/><path d="M37 56c-9-1-18 2-21 8 8 3 17 1 23-3z" fill="${dark}" ${S}/>`;
+    const beanie=`<path d="M37 54c0-22 15-34 33-34s33 12 33 34z" fill="${cloth}" ${S}/><rect x="34" y="47" width="72" height="12" rx="6" fill="${dk(c,.22)}" ${S}/><circle cx="70" cy="18" r="7.5" fill="#fff" ${S}/>`;
+    const phones=`<path d="M33 64c0-30 16-46 37-46s37 16 37 46" stroke="${OUT}" stroke-width="9" fill="none"/><path d="M33 64c0-30 16-46 37-46s37 16 37 46" stroke="#3B3456" stroke-width="5" fill="none"/><rect x="24" y="52" width="17" height="27" rx="7" fill="${cloth}" ${S}/><rect x="99" y="52" width="17" height="27" rx="7" fill="${cloth}" ${S}/>`;
+    const glasses=`<g fill="#fff" fill-opacity=".14" stroke="${OUT}" stroke-width="2.4"><circle cx="58" cy="65" r="10"/><circle cx="82" cy="65" r="10"/></g><path d="M68 64q2-2 4 0" stroke="${OUT}" stroke-width="2.4" fill="none"/>`;
+    const shades=`<path d="M45 58h22l-3 13H49zM73 58h22l-4 13H76z" fill="#17122B" ${S2}/><path d="M67 60h6" stroke="${OUT}" stroke-width="2.4"/><path d="M50 61h7M78 61h7" stroke="#fff" stroke-opacity=".5" stroke-width="2"/>`;
+    const rings=`<circle cx="37" cy="76" r="4.5" fill="none" stroke="#F2C14E" stroke-width="2.2"/><circle cx="103" cy="76" r="4.5" fill="none" stroke="#F2C14E" stroke-width="2.2"/>`;
+    const sets={
+      ritme:[ // gorra, monyos, cresta, cua
+        ()=>['',skull+face+cap],
+        ()=>[bumps([[40,32,15],[100,32,15]]),skull+face+fringe+`<path d="M40 44q30-12 60 0" stroke="${c}" stroke-width="7" fill="none" stroke-linecap="round"/>`],
+        ()=>['',skull+face+`<path d="M54 36l2-22 8 10 6-18 6 18 8-10 2 22c-10-6-22-6-32 0z" fill="${H}" ${S}/>`],
+        ()=>[`<path d="M92 34c28-4 34 26 20 48-2-18-10-24-20-26z" fill="${H}" ${S}/>`,skull+face+fringe+`<circle cx="96" cy="36" r="6" fill="${c}" ${S2}/>`]],
+      baix:[ // cascos, afro i ulleres de sol, barret, punxes
+        ()=>['',skull+fringe+face+phones],
+        ()=>[bumps([[40,58,15],[44,38,17],[62,25,18],[82,26,18],[98,40,17],[101,59,15]]),skull+face+shades],
+        ()=>[`<path d="M34 56c-6 26-2 40 8 44l8-34zM106 56c6 26 2 40-8 44l-8-34z" fill="${H}" ${S}/>`,skull+face+`<path d="M44 42c2-18 12-24 26-24s24 6 26 24z" fill="${dark}" ${S}/><ellipse cx="70" cy="43" rx="45" ry="8" fill="${dark}" ${S}/><path d="M46 37h48" stroke="#fff" stroke-width="4"/>`],
+        ()=>['',skull+face+`<path d="M37 58L34 34l14 8 2-22 14 14 10-22 8 22 16-12-2 22 14-4-8 28c-14-18-50-20-65 0z" fill="${H}" ${S}/>`]],
+      harmonia:[ // gorro i ulleres, trenes, boina i bigoti, ratlla al costat
+        ()=>['',skull+face+glasses+beanie],
+        ()=>[[34,106].map(x=>`<g fill="${H}" ${S}><circle cx="${x}" cy="68" r="8"/><circle cx="${x}" cy="82" r="7"/><circle cx="${x}" cy="94" r="6"/></g><circle cx="${x}" cy="103" r="4" fill="${c}" ${S2}/>`).join(''),skull+face+fringe],
+        ()=>['',skull+face+`<path d="M56 78q7-6 14 0q7-6 14 0q-7 5-14 1q-7 4-14-1z" fill="${H}" ${S2}/><path d="M34 46c4-24 54-34 74-8 6 8-2 14-14 10-16-6-40-6-52 2-6 3-9 1-8-4z" fill="${cloth}" ${S}/><path d="M72 22l3-8" stroke="${OUT}" stroke-width="4" stroke-linecap="round"/>`],
+        ()=>['',skull+face+`<path d="M37 60c-2-28 18-40 40-36 18 3 28 16 26 36-6-14-14-22-22-24-8 14-26 20-44 24z" fill="${H}" ${S}/>`+glasses]],
+      melodia:[ // rissos, cua lateral, caputxa, cuetes
+        ()=>[bumps([[40,60,14],[43,40,15],[57,27,16],[83,27,16],[97,40,15],[100,60,14],[70,22,15]]),rings+skull+face+`<path d="M42 47c6-10 18-15 28-13 10-2 22 3 28 13-6-3-12-3-17 0-4-4-17-4-22 0-5-3-11-3-17 0z" fill="${H}"/>`],
+        ()=>[`<path d="M44 34C14 30 12 66 26 92c0-20 8-28 22-30z" fill="${H}" ${S}/>`,rings+skull+face+fringe+`<path d="M88 30l4 8 9 1-7 6 2 9-8-5-8 5 2-9-7-6 9-1z" fill="#F2C14E" ${S2}/>`],
+        ()=>[`<path d="M26 74c-6-44 20-62 44-62s50 18 44 62c-4 22-84 22-88 0z" fill="${cloth}" ${S}/>`,skull+face+`<path d="M40 50c8-18 52-18 60 0-10-6-20-2-30-4s-20-2-30 4z" fill="${H}" ${S}/>`],
+        ()=>[bumps([[30,48,13],[24,66,9],[110,48,13],[116,66,9]]),skull+face+fringe+`<circle cx="38" cy="42" r="5" fill="${c}" ${S2}/><circle cx="102" cy="42" r="5" fill="${c}" ${S2}/>`]]
+    };
+    const [bk,fr]=sets[layer][v]();back=bk;headpart=neck+ears+fr;
+  }
+  const robotBox=layer==='efectes'&&!myst?[`<rect x="54" y="122" width="32" height="26" rx="6" fill="#1D1934" ${S2}/><circle cx="62" cy="131" r="3" fill="${lt(c,.3)}"/><circle cx="70" cy="131" r="3" fill="#F2C14E"/><circle cx="78" cy="131" r="3" fill="#E5484D"/>`,
+    emblem,`<ellipse cx="70" cy="140" rx="18" ry="20" fill="#F4E7CF" ${S2}/>`,emblem][v]:emblem;
+  const behind=['sticks','mic','maracas','none','clap','whistle','cymbal','flute','trumpet','vinyl','megaphone','siren','laser','rocket'].includes(prop)||myst;
+  const emb=behind?robotBox:'';
+  const clapFx=prop==='clap'?`<path d="M70 112v-9M58 116l-6-7M82 116l6-7" stroke="${lt(c,.35)}" stroke-width="3" stroke-linecap="round"/>`:'';
+  const box=faceOnly?'20 4 100 100':'0 0 140 220';
+  const body=faceOnly?'':`<ellipse class="glow" cx="70" cy="209" rx="54" ry="10"/><ellipse class="shadow" cx="70" cy="209" rx="40" ry="6"/>`;
+  const under=faceOnly?'':legs+torso+emb+props+armL+armR+clapFx;
+  return `<svg viewBox="${box}" class="char${calm?' calm':''}" aria-hidden="true">${defs}${body}<g class="fig">${back}${under}<g class="head">${headpart}</g>${faceOnly?'':front}</g></svg>`;
 }
 
 function renderSlot(i){
@@ -1249,7 +1323,7 @@ function renderSlot(i){
   if(sl.muted)el.classList.add('muted');
   if(sl.solo)el.classList.add('soloed');
   const nm=my?'???':snd.name, ly=my?'Misteri':L.name;
-  el.innerHTML=`<div class="beam" aria-hidden="true"></div><div class="lamp" aria-hidden="true"></div><button class="figbtn" aria-label="${my?(dictat.active?'Revela aquest so':'So misteriós'):(sl.muted?'Activa ':'Silencia ')+snd.name}">${charSVG(snd.layer,my)}</button>
+  el.innerHTML=`<div class="beam" aria-hidden="true"></div><div class="lamp" aria-hidden="true"></div><button class="figbtn" aria-label="${my?(dictat.active?'Revela aquest so':'So misteriós'):(sl.muted?'Activa ':'Silencia ')+snd.name}">${charSVG(snd.layer,my,snd)}</button>
    <div class="slot-name">${nm}</div><div class="slot-layer">${ly}</div>
    <div class="slot-ctl" ${mystery?'hidden':''}>
     <button data-a="m" aria-pressed="${sl.muted}" title="Silencia (mute)" aria-label="Silencia">${kid()?'Calla':'M'}</button>
@@ -1417,7 +1491,7 @@ function drawBeat(s){
 function renderPalette(){
   const used=new Set(mystery?[]:slots.filter(s=>s.sound).map(s=>s.sound.id));
   $('palette').innerHTML=LKEYS.map(l=>{const L=LAYERS[l];
-    const chips=style.sounds.filter(s=>s.layer===l).map(s=>`<button class="chip${used.has(s.id)?' used':''}" data-id="${s.id}" style="--c:var(--${l})"><span class="g" aria-hidden="true">${icon(l)}</span><span class="t">${hiddenStyle?'???':s.name}</span></button>`).join('');
+    const chips=style.sounds.filter(s=>s.layer===l).map(s=>`<button class="chip${used.has(s.id)?' used':''}" data-id="${s.id}" style="--c:var(--${l})"><span class="g${hiddenStyle?'':' av'}" aria-hidden="true">${hiddenStyle?icon(l):charSVG(l,false,s,true)}</span><span class="t">${hiddenStyle?'???':s.name}</span></button>`).join('');
     return `<div class="prow" style="--c:var(--${l})" title="${L.desc}"><div class="phead"><b>${icon(l)}${L.name}</b>${kid()?`<small>${SUB[l]}</small>`:''}</div><div class="chips">${chips}</div></div>`;}).join('');
 }
 
